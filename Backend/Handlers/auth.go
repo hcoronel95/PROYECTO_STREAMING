@@ -1,5 +1,13 @@
 // (para el manejo de rutas/endpoints)
 
+// Backend/models/handlers/auth.go
+/*Autores: Henry Aliaga / Ismael Espinoza
+Fecha: 05/12/2024
+Lenguaje: Golang
+Descipcion: Asignacion de la clase auth, con sus respectivas
+funciones para el manejo de rutas
+*/
+
 // handlers/auth.go
 package handlers
 
@@ -40,7 +48,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	var req LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Error al leer el cuerpo de la petición", http.StatusBadRequest)
+		http.Error(w, "Error ingreso de datos", http.StatusBadRequest)
 		return
 	}
 

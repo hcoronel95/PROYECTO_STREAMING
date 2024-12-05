@@ -1,5 +1,13 @@
 //(para el manejo de rutas/endpoints)
 
+// Backend/models/handlers/user.go
+/*Autores: Henry Aliaga / Ismael Espinoza
+Fecha: 05/12/2024
+Lenguaje: Golang
+Descipcion: Asignacion de la clase users, con sus respectivas
+funciones para el manejo de rutas
+*/
+
 // handlers/user.go
 package handlers
 

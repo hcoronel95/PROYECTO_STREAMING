@@ -1,3 +1,11 @@
+// Backend/models/database/mysql.go
+/*Autores: Henry Aliaga / Ismael Espinoza
+Fecha: 05/12/2024
+Lenguaje: Golang
+Descipcion: Asignacion de la clase mysql, con sus respectivas
+funcion para la conexion con la base de datos
+*/
+
 package database
 
 import (

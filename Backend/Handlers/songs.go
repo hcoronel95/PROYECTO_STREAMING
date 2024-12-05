@@ -1,5 +1,12 @@
 //(para el manejo de rutas/endpoints)
 
+// Backend/models/handlers/songs.go
+/*Autores: Henry Aliaga / Ismael Espinoza
+Fecha: 05/12/2024
+Lenguaje: Golang
+Descipcion: Asignacion de la clase songs, con sus respectivas
+funciones para el manejo de rutas
+*/
 // handlers/song.go
 package handlers
 
