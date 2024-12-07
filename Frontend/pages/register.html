@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Streaming Music</title>
+    <title>Registro - Streaming Music</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/style.css" rel="stylesheet">
 </head>
@@ -13,7 +13,11 @@
             <div class="login-card card">
                 <div class="card-body">
                     <h2 class="text-center mb-4">Streaming Music</h2>
-                    <form id="loginForm">
+                    <form id="registerForm">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="name" required>
+                        </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
                             <input type="email" class="form-control" id="email" required>
@@ -23,12 +27,12 @@
                             <input type="password" class="form-control" id="password" required>
                         </div>
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">Ingresar</button>
+                            <button type="submit" class="btn btn-primary">Registrar</button>
                         </div>
                         <div id="errorMessage" class="error-message text-center mt-3"></div>
                         <div class="text-center mt-3">
-                            <a href="register.html" class="text-decoration-none">
-                                ¿No tienes cuenta? <span class="text-primary">Regístrate aquí</span>
+                            <a href="login.html" class="text-decoration-none">
+                                ¿Ya tienes cuenta? <span class="text-primary">Inicia sesión aquí</span>
                             </a>
                         </div>
                     </form>
@@ -37,6 +41,6 @@
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/main.js"></script>
+    <script src="/js/register.js"></script>
 </body>
 </html>

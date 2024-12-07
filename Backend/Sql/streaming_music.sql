@@ -1,5 +1,5 @@
 -- Crear la base de datos
-CREATE DATABASE IF NOT EXISTS streaming_music;
+CREATE DATABASE streaming_music;
 USE streaming_music;
 
 -- Tabla de usuarios

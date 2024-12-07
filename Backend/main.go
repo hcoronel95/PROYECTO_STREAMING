@@ -98,6 +98,90 @@ func (s *StreamingSystem) GetLibrary() ([]*models.Song, error) {
 	return songs, nil
 }
 
+func initializeDatabase(db *sql.DB) error {
+	log.Println("Verificando usuarios existentes...")
+	var count int
+	err := db.QueryRow("SELECT COUNT(*) FROM users").Scan(&count)
+	if err != nil {
+		return fmt.Errorf("error verificando usuarios: %v", err)
+	}
+
+	log.Printf("Usuarios encontrados: %d", count)
+
+	if count == 0 {
+		log.Println("No hay usuarios, procediendo a insertar...")
+
+		tx, err := db.Begin()
+		if err != nil {
+			return fmt.Errorf("error iniciando transacción: %v", err)
+		}
+
+		// Insertar administradores
+		adminQuery := `
+            INSERT INTO users (name, email, password, role) VALUES
+            ('HENRY ALIAGA', 'henry@example.com', 'admin123', 'admin'),
+            ('ISMAEL ESPINOZA', 'ismael@example.com', 'admin123', 'admin')
+        `
+		result, err := tx.Exec(adminQuery)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("error insertando admins: %v", err)
+		}
+		adminRows, _ := result.RowsAffected()
+		log.Printf("Administradores insertados: %d", adminRows)
+
+		// Insertar usuarios regulares
+		userQuery := `
+            INSERT INTO users (name, email, password, role) VALUES
+            ('Juan Perez', 'juan.perez@example.com', 'password123', 'user'),
+            ('Ana Gomez', 'ana.gomez@example.com', 'securepass456', 'user'),
+            ('Carlos Lopez', 'carlos.lopez@example.com', 'qwerty789', 'user')
+        `
+		result, err = tx.Exec(userQuery)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("error insertando usuarios: %v", err)
+		}
+		userRows, _ := result.RowsAffected()
+		log.Printf("Usuarios regulares insertados: %d", userRows)
+
+		if err = tx.Commit(); err != nil {
+			return fmt.Errorf("error en commit: %v", err)
+		}
+
+		log.Println("Transacción completada exitosamente")
+	}
+
+	// Verificación final
+	var users []struct {
+		Email string
+		Role  string
+	}
+	rows, err := db.Query("SELECT email, role FROM users")
+	if err != nil {
+		return fmt.Errorf("error verificando usuarios finales: %v", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var u struct {
+			Email string
+			Role  string
+		}
+		if err := rows.Scan(&u.Email, &u.Role); err != nil {
+			return fmt.Errorf("error leyendo usuario: %v", err)
+		}
+		users = append(users, u)
+	}
+
+	log.Printf("Usuarios en la base de datos después de la inicialización:")
+	for _, u := range users {
+		log.Printf("- Email: %s, Role: %s", u.Email, u.Role)
+	}
+
+	return nil
+}
+
 // Middleware para verificar autenticación
 func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -144,8 +228,7 @@ func setupRoutes(sys *StreamingSystem) {
 
 	// Rutas de canciones
 	http.HandleFunc("/api/songs", authMiddleware(songHandler.GetSongs))
-	http.HandleFunc("/api/songs/add", adminMiddleware(songHandler.AddSong)) // Solo accesible para admins
-	//http.HandleFunc("/api/songs/remove", adminMiddleware(songHandler.RemoveSong)) // Solo accesible para admins TERMINAR
+	http.HandleFunc("/api/songs/add", adminMiddleware(songHandler.AddSong))
 
 	// Rutas de reproducción
 	http.HandleFunc("/api/songs/play/", authMiddleware(func(w http.ResponseWriter, r *http.Request) {
@@ -231,14 +314,21 @@ func setupRoutes(sys *StreamingSystem) {
 func main() {
 	// Inicializar la base de datos
 	config := database.GetDefaultConfig()
-	err := database.InitDB(config) // Solo asignamos el error
+	err := database.InitDB(config)
 	if err != nil {
 		log.Fatalf("Error inicializando base de datos: %v", err)
 	}
 	defer database.CloseDB()
 
-	// Crear instancia del sistema
+	// Obtener la conexión a la base de datos
 	db := database.GetDB()
+
+	// Inicializar la base de datos con usuarios
+	log.Println("Iniciando la inicialización de la base de datos...")
+	if err := initializeDatabase(db); err != nil {
+		log.Fatalf("Error inicializando datos: %v", err)
+	}
+	log.Println("Base de datos inicializada correctamente")
 
 	// Crear instancia del sistema
 	sys, err := NewStreamingSystem(db)
@@ -249,17 +339,29 @@ func main() {
 	// Configurar rutas
 	setupRoutes(sys)
 
-	// Cargar canciones de ejemplo
-	songs := []models.Song{
-		{ID: 1, Title: "Thunderstruck", Artist: "AC/DC", Genre: "Rock", FileSize: 5 * 1024 * 1024},
-		{ID: 2, Title: "Memories", Artist: "Maroon 5", Genre: "Pop", FileSize: 4 * 1024 * 1024},
-		{ID: 3, Title: "Bohemian Rhapsody", Artist: "Queen", Genre: "Rock", FileSize: 6 * 1024 * 1024},
+	// Verificar e insertar canciones de ejemplo en la base de datos
+	var songCount int
+	err = db.QueryRow("SELECT COUNT(*) FROM songs").Scan(&songCount)
+	if err != nil {
+		log.Printf("Error verificando canciones: %v", err)
 	}
 
-	for _, song := range songs {
-		if err := sys.AddSong(&song); err != nil {
-			log.Printf("Error agregando canción: %v", err)
+	if songCount == 0 {
+		log.Println("Cargando canciones de ejemplo...")
+		songs := []models.Song{
+			{ID: 1, Title: "Thunderstruck", Artist: "AC/DC", Genre: "Rock", FileSize: 5 * 1024 * 1024},
+			{ID: 2, Title: "Memories", Artist: "Maroon 5", Genre: "Pop", FileSize: 4 * 1024 * 1024},
+			{ID: 3, Title: "Bohemian Rhapsody", Artist: "Queen", Genre: "Rock", FileSize: 6 * 1024 * 1024},
 		}
+
+		for _, song := range songs {
+			if err := sys.AddSong(&song); err != nil {
+				log.Printf("Error agregando canción %s: %v", song.Title, err)
+			} else {
+				log.Printf("Canción agregada correctamente: %s", song.Title)
+			}
+		}
+		log.Println("Canciones de ejemplo cargadas correctamente")
 	}
 
 	// Iniciar servidor HTTP
