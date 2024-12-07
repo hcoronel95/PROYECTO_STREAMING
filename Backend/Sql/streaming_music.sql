@@ -58,3 +58,9 @@ CREATE TABLE playbacks (
 INSERT INTO users (name, email, password, role) VALUES
 ('HENRY ALIAGA', 'henry@example.com', 'admin123', 'admin'),
 ('ISMAEL ESPINOZA', 'ismael@example.com', 'admin123', 'admin');
+
+-- Insertar usuarios simulados
+INSERT INTO users (name, email, password, role) VALUES
+('Juan Perez', 'juan.perez@example.com', 'password123', 'user'),
+('Ana Gomez', 'ana.gomez@example.com', 'securepass456', 'user'),
+('Carlos Lopez', 'carlos.lopez@example.com', 'qwerty789', 'user');

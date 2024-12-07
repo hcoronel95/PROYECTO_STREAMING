@@ -1,0 +1,124 @@
+/* Estilo general del body */
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(to bottom, #004d73, #002c47);
+    color: white;
+    margin: 0;
+    padding: 0;
+}
+
+/* Estilo para el encabezado y la información del usuario */
+header {
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    text-align: left;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-right: 15px;
+    border: 2px solid white;
+}
+
+.user-info h2 {
+    font-size: 22px;
+    margin: 0;
+    color: #FFD700;
+}
+
+/* Estilo para la sección de recomendaciones */
+.recommendations {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    margin: 20px auto;
+    width: 90%;
+    max-width: 1200px;
+    text-align: center;
+}
+
+.recommendations h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #FFD700;
+}
+
+.recommendation-list {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.recommendation-list img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 10px;
+    transition: transform 0.3s;
+}
+
+.recommendation-list img:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 10px #FFD700;
+}
+
+/* Estilo para la sección "Tu Música" */
+.your-music {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    margin: 20px auto;
+    width: 90%;
+    max-width: 1200px;
+    text-align: center;
+}
+
+.your-music h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #FFD700;
+}
+
+.music-list {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.music-list img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
+    transition: transform 0.3s;
+}
+
+.music-list img:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 10px #FFD700;
+}
+
+/* Pie de página */
+footer {
+    text-align: center;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    margin-top: 20px;
+}
+
+footer a {
+    color: #FFD700;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}

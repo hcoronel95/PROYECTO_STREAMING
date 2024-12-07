@@ -1,5 +1,3 @@
-// (para el manejo de rutas/endpoints)
-
 // Backend/models/handlers/auth.go
 /*Autores: Henry Aliaga / Ismael Espinoza
 Fecha: 05/12/2024
@@ -8,7 +6,6 @@ Descipcion: Asignacion de la clase auth, con sus respectivas
 funciones para el manejo de rutas
 */
 
-// handlers/auth.go
 package handlers
 
 import (
@@ -80,6 +77,8 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
 		return
 	}
+
+	// Invalida el token aquí si es necesario (por ejemplo, eliminándolo de la base de datos)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Sesión cerrada exitosamente"})

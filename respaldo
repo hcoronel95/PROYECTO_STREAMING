@@ -106,7 +106,7 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			http.Error(w, "No autorizado", http.StatusUnauthorized)
 			return
 		}
-		// Validar token o configuración aquí
+		// Algunas configuraciones para el manejo de token que se esta considerando para su implementacion
 		next(w, r)
 	}
 }
@@ -114,8 +114,9 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 // Middleware para verificar el rol de administrador
 func adminMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Aquí se debe agregar un token de administrador
 		token := r.Header.Get("Authorization")
-		if token != "admin-token" { // Verificación de token de administrador
+		if token != "admin-token" { // Ejemplo de token para verificar rol de administrador
 			http.Error(w, "Acceso no autorizado", http.StatusForbidden)
 			return
 		}
@@ -144,8 +145,7 @@ func setupRoutes(sys *StreamingSystem) {
 
 	// Rutas de canciones
 	http.HandleFunc("/api/songs", authMiddleware(songHandler.GetSongs))
-	http.HandleFunc("/api/songs/add", adminMiddleware(songHandler.AddSong)) // Solo accesible para admins
-	//http.HandleFunc("/api/songs/remove", adminMiddleware(songHandler.RemoveSong)) // Solo accesible para admins TERMINAR
+	http.HandleFunc("/api/songs/add", authMiddleware(songHandler.AddSong))
 
 	// Rutas de reproducción
 	http.HandleFunc("/api/songs/play/", authMiddleware(func(w http.ResponseWriter, r *http.Request) {

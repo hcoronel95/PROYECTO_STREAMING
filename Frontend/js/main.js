@@ -1,4 +1,3 @@
-// Frontend/js/main.js
 document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.getElementById('loginForm');
     const errorMessage = document.getElementById('errorMessage');
@@ -25,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Redirigir según el rol del usuario
                 if (data.role === 'admin') {
                     window.location.href = '/pages/admin.html';
+                
                 } else {
                     window.location.href = '/pages/player.html';
                 }

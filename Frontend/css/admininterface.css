@@ -1,0 +1,154 @@
+/* General */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #121212;
+    color: white;
+    background-image: url("../images/turntable.jpg"); /* Imagen del tocadiscos */
+    background-size: cover; /* Ocupará todo el fondo */
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Header */
+.admin-info {
+    position: fixed; /* Fija el header en la parte superior */
+    top: 0;
+    left: 0;
+    width: 100%; /* Ocupa todo el ancho */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 10px; /* Reducir espaciado interno */
+    background-color: rgba(31, 31, 31, 0.9); /* Fondo semitransparente */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    z-index: 10; /* Asegura que esté sobre el contenido */
+    height: 40px; /* Altura más reducida */
+}
+
+.admin-info p {
+    margin: 0;
+    font-size: 0.85em; /* Tamaño del texto reducido */
+    font-weight: bold;
+}
+
+.logout {
+    background-color: #e63946;
+    color: white;
+    padding: 4px 8px; /* Botón más pequeño */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.75em; /* Ajuste al tamaño reducido del header */
+}
+
+.logout:hover {
+    background-color: #a71e27;
+}
+
+/* Main container */
+.dashboard-container {
+    margin-top: 45px; /* Ajustar espacio para el header */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Ocupa el ancho completo */
+    height: calc(100vh - 45px); /* Ocupa todo el alto restante */
+    position: relative;
+}
+
+/* Turntable Style (Fondo principal) */
+.turntable {
+    background: none; /* Elimina la imagen circular previa */
+    width: 100%;
+    height: 100%;
+    position: absolute; /* Asegura que ocupe todo el fondo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+}
+
+/* Título en el centro de la página */
+.turntable h2 {
+    margin-bottom: 20px;
+    font-size: 2em;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+}
+
+/* Buttons around */
+.dashboard-btn {
+    position: absolute;
+    background-color: #008CBA;
+    color: white;
+    border: none;
+    border-radius: 5px; /* Bordes cuadrados */
+    padding: 15px 30px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.3s;
+}
+
+.dashboard-btn:hover {
+    background-color: #005f7a;
+    transform: scale(1.1);
+}
+
+/* Posicionamiento de los botones */
+#recommendations {
+    top: 15%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#comments {
+    top: 50%;
+    right: 10%;
+    transform: translate(50%, -50%);
+}
+
+#content {
+    bottom: 15%;
+    left: 50%;
+    transform: translate(-50%, 50%);
+}
+
+#users {
+    top: 50%;
+    left: 10%;
+    transform: translate(-50%, -50%);
+}
+
+#reports {
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-btn {
+        padding: 10px 20px;
+        font-size: 0.9em;
+    }
+
+    .admin-info {
+        height: 35px; /* Reducir aún más el header en pantallas pequeñas */
+        padding: 5px 10px;
+    }
+
+    .logout {
+        padding: 3px 6px;
+        font-size: 0.7em;
+    }
+}
+
+@media (min-width: 1400px) {
+    .dashboard-btn {
+        padding: 20px 40px;
+        font-size: 1.2em;
+    }
+}
+
