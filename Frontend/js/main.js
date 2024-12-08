@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     window.location.href = '/pages/admin.html';
                 
                 } else {
-                    window.location.href = '/pages/player.html';
+                    window.location.href = '/pages/user.html';
                 }
             } else {
                 errorMessage.style.display = 'block';

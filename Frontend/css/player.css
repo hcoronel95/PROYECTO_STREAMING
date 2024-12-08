@@ -1,16 +1,87 @@
 /* Frontend/css/style.css */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: url('/path/to/headphones-background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+}
+
 .login-container {
     min-height: 100vh;
     display: flex;
+    justify-content: center;
     align-items: center;
 }
 
 .login-card {
     max-width: 400px;
     width: 100%;
-    margin: auto;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
     padding: 20px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    color: white;
+}
+
+.login-card h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.login-card .form-group {
+    margin-bottom: 15px;
+}
+
+.login-card .form-group input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.login-card .form-group input[type="text"],
+.login-card .form-group input[type="password"] {
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+}
+
+.login-card .form-group input:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.8);
+}
+
+.login-card .btn-login {
+    width: 100%;
+    padding: 10px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.login-card .btn-login:hover {
+    background: #0056b3;
+}
+
+.login-card a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    margin-top: 10px;
+    display: block;
+    opacity: 0.8;
+}
+
+.login-card a:hover {
+    opacity: 1;
 }
 
 .error-message {

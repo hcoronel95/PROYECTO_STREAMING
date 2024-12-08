@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,42 +7,52 @@
     <link rel="stylesheet" href="../css/userinterface.css">
 </head>
 <body>
+    <!-- Botón de lupa en la esquina superior derecha -->
+    <button class="search-button" title="Buscar">
+        🔍
+    </button>
+
     <!-- Encabezado con información del usuario -->
     <header>
         <div class="user-info">
-            <img src="../images/user-avatar.jpg" alt="Avatar" class="avatar">
-            <h2>Bienvenido, Usuario</h2>
+            <img src="../images/user-avatar.jpg" alt="Avatar del Usuario" class="avatar">
+            <h2>Bienvenido, [JUAN PEREZ] </h2>
         </div>
     </header>
 
-    <!-- Contenido principal -->
-    <main>
+    <!-- Contenedor principal para las secciones Recomendaciones y Tu Música -->
+    <main class="main-container">
         <!-- Sección de recomendaciones -->
         <section class="recommendations">
             <h2>Recomendaciones de hoy:</h2>
             <div class="recommendation-list">
-                <img src="../images/nirvana.jpg" alt="Nirvana">
-                <img src="../images/beatles.jpg" alt="The Beatles">
-                <img src="../images/queen.jpg" alt="Queen">
+                <img src="../images/nirvana.jpg" alt="Nirvana" title="Nirvana">
+                <img src="../images/beatles.jpg" alt="The Beatles" title="The Beatles">
+                <img src="../images/queen.jpg" alt="Queen" title="Queen">
             </div>
         </section>
 
         <!-- Sección "Tu Música" -->
         <section class="your-music">
-            <h2>Tu música</h2>
+            <h2>Tu Música</h2>
             <div class="music-list">
-                <img src="../images/metallica.jpg" alt="Metallica">
-                <img src="../images/blackmetal.jpg" alt="Black Metal">
-                <img src="../images/misfits.jpg" alt="Misfits">
-                <img src="../images/otros.jpg" alt="Otros">
+                <img src="../images/metallica.jpg" alt="Metallica" title="Metallica">
+                <img src="../images/blackmetal.jpg" alt="Black Metal" title="Black Metal">
+                <img src="../images/misfits.jpg" alt="Misfits" title="Misfits">
+                <img src="../images/otros.jpg" alt="Otros" title="Otros">
             </div>
         </section>
+
+        <!-- Botón rojo "Salir" colocado a la derecha -->
+        <button class="logout-button">Salir</button>
     </main>
 
     <!-- Pie de página -->
     <footer>
         <p>© 2024 Streaming Music. <a href="#">Política de privacidad</a></p>
     </footer>
+
+    <!-- Archivo JavaScript -->
+    <script src="../js/user.js"></script>
 </body>
-<script src="../js/user.js"></script>
 </html>
