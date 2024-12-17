@@ -1,91 +1,227 @@
-/* Frontend/css/style.css */
+/* Estilo general del body */
 body {
-    margin: 0;
     font-family: Arial, sans-serif;
-    background: url('/path/to/headphones-background.jpg') no-repeat center center fixed;
+    margin: 0;
+    padding: 0;
+    height: 100vh; /* Ocupa toda la altura de la ventana */
+    background-color: #121212; /* Color de fondo general */
+    background-image: url("../images/instruments.jpg"); /* Ruta de la imagen */
     background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     color: white;
 }
 
-.login-container {
-    min-height: 100vh;
+/* Estilo para el encabezado */
+header {
+    background-color: #1a1a1a;
+    padding: 15px 0;
+    color: white;
+}
+
+header .container {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
 }
 
-.login-card {
-    max-width: 400px;
-    width: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-    text-align: center;
-    color: white;
-}
-
-.login-card h1 {
+header h1 {
     font-size: 24px;
-    margin-bottom: 20px;
-    font-weight: bold;
+    margin-left: 15px;
 }
 
-.login-card .form-group {
-    margin-bottom: 15px;
+nav {
+    display: flex;
+    gap: 15px;
 }
 
-.login-card .form-group input {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-}
-
-.login-card .form-group input[type="text"],
-.login-card .form-group input[type="password"] {
-    background: rgba(255, 255, 255, 0.9);
-    color: #333;
-}
-
-.login-card .form-group input:focus {
-    outline: none;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.8);
-}
-
-.login-card .btn-login {
-    width: 100%;
-    padding: 10px;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.login-card .btn-login:hover {
-    background: #0056b3;
-}
-
-.login-card a {
-    color: #fff;
+nav a {
     text-decoration: none;
+    color: white;
+    font-size: 18px;
+    transition: color 0.3s;
+}
+
+nav a:hover {
+    color: #f39c12;
+}
+
+.logout-btn {
+    color: white;
+    background-color: #e74c3c; /* Rojo */
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.logout-btn:hover {
+    background-color: #c0392b; /* Rojo más oscuro al pasar el mouse */
+}
+
+/* Estilo para el contenedor de la búsqueda */
+.search-container {
+    position: relative;
+    width: 300px;
+    margin-top: 20px;
+}
+
+.search-container input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    background-color: #333;
+    color: rgb(252, 85, 85);
+}
+
+.search-container input:focus {
+    outline: none;
+    border-color: #f39c12;
+}
+
+/* Estilo para la sección de la biblioteca */
+.song-list-container {
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+/* Estilo para las imágenes de la biblioteca */
+.custom-img-size {
+    width: 100%; /* Asegura que las imágenes ocupen todo el ancho de su contenedor */
+    height: 200px; /* Asigna una altura constante */
+    object-fit: cover; /* Asegura que las imágenes cubran completamente el área sin distorsionarse */
+    border-radius: 10px; /* Bordes redondeados */
+}
+
+.song-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px; /* Bordes redondeados */
+}
+
+/* Estilo para el reproductor fijo inferior */
+.player-bar {
+    background-color: rgba(250, 244, 244, 0.6); /* Fondo negro semitransparente */
+    backdrop-filter: blur(10px); /* Efecto de desenfoque */
+    -webkit-backdrop-filter: blur(10px); /* Compatibilidad con navegadores Webkit */
+    box-shadow: 0 -2px 10px rgba(244, 242, 242, 0.5); /* Sombra superior */
+    padding: 15px; /* Espaciado interno */
+    z-index: 10; /* Prioridad sobre otros elementos */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed; /* Fijar el reproductor en la parte inferior */
+    bottom: 0; /* Asegura que se quede en la parte inferior de la pantalla */
+    width: 100%; /* Asegura que el reproductor ocupe todo el ancho */
+    max-height: 100px; /* Controla la altura máxima para que no ocupe mucho espacio */
+    overflow: hidden; /* Previene el desbordamiento */
+}
+
+/* Ajuste de los elementos dentro del reproductor */
+.player-bar img {
+    border-radius: 5px;
+    margin-right: 15px;
+    max-width: 50px; /* Controla el tamaño de la imagen */
+    max-height: 50px;
+}
+
+/* Botones del reproductor */
+.player-bar button {
+    transition: all 0.3s ease;
+}
+
+.player-bar button:hover {
+    transform: scale(1.1);
+    background-color: rgba(122, 120, 207, 0.867); /* Efecto hover */
+}
+
+/* Ajuste del texto para mejor visibilidad */
+.player-bar h6, .player-bar small {
+    text-shadow: 0 1px 3px rgba(174, 235, 9, 0.7); /* Sombras al texto */
+}
+
+/* Compatibilidad para navegadores antiguos */
+@supports not (backdrop-filter: blur(10px)) {
+    .player-bar {
+        background-color: rgba(250, 248, 248, 0.8); /* Mayor opacidad si no hay soporte de blur */
+    }
+}
+
+/* Añadir espacio suficiente en el cuerpo de la página para no tapar contenido */
+body {
+    padding-bottom: 100px; /* Espacio debajo para que el contenido no quede cubierto */
+}
+
+
+
+.player-bar .container {
+    display: flex;
+    justify-content: center; /* Alinea los controles al centro */
+    align-items: center;
+}
+
+.player-bar .controls {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.player-bar .controls button {
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    font-size: 18px;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background 0.3s, transform 0.3s;
+}
+
+.player-bar .controls button:hover {
+    background: #f39c12;
+    transform: scale(1.1);
+}
+
+/* Alineación de la imagen y texto del reproductor */
+.player-bar .container .d-flex {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.player-bar img {
+    border-radius: 5px;
+}
+
+.player-bar h6 {
+    margin-bottom: 0;
+}
+
+.player-bar small {
     font-size: 14px;
-    margin-top: 10px;
-    display: block;
-    opacity: 0.8;
+    color: #aaa;
 }
 
-.login-card a:hover {
-    opacity: 1;
+/* Estilos adicionales */
+.container {
+    margin: 0 auto;
+    max-width: 1200px;
+    padding: 20px;
 }
 
-.error-message {
-    color: #dc3545;
-    display: none;
-    margin-top: 10px;
+h2, p {
+    color: white;
+}
+
+footer {
+    background-color: #1a1a1a;
+    padding: 10px 0;
+    color: white;
+    text-align: center;
 }

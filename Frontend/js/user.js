@@ -16,3 +16,11 @@ document.querySelector(".logout-button").addEventListener("click", () => {
             .catch((err) => console.error("Error:", err));
     }
 });
+
+// Evento para los botones de música en las secciones "Recomendaciones" y "Tu Música"
+document.querySelectorAll(".music-button").forEach((button) => {
+    button.addEventListener("click", () => {
+        // Redirige al usuario a la página de player
+        window.location.href = "/pages/player.html";
+    });
+});
