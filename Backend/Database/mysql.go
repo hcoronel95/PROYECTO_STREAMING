@@ -2,8 +2,8 @@
 /*Autores: Henry Aliaga / Ismael Espinoza
 Fecha: 05/12/2024
 Lenguaje: Golang
-Descipcion: Asignacion de la clase mysql, con sus respectivas
-funcion para la conexion con la base de datos
+Descripción: Asignación de la clase MySQL, con sus respectivas
+funciones para la conexión con la base de datos y recomendaciones.
 */
 
 package database
@@ -84,4 +84,74 @@ func CloseDB() error {
 		return db.Close()
 	}
 	return nil
+}
+
+// GetRecommendationsByGenres devuelve una lista de canciones recomendadas para múltiples géneros.
+func GetRecommendationsByGenres(genres []string, limit int) (map[string][]string, error) {
+	recommendations := make(map[string][]string)
+
+	for _, genre := range genres {
+		query := `
+			SELECT title 
+			FROM songs 
+			WHERE genre = ? 
+			ORDER BY created_at DESC 
+			LIMIT ?`
+		rows, err := db.Query(query, genre, limit)
+		if err != nil {
+			log.Printf("Error al obtener recomendaciones para el género %s: %v", genre, err)
+			return nil, err
+		}
+		defer rows.Close()
+
+		var songs []string
+		for rows.Next() {
+			var title string
+			if err := rows.Scan(&title); err != nil {
+				log.Printf("Error al leer la fila de canciones: %v", err)
+				return nil, err
+			}
+			songs = append(songs, title)
+		}
+
+		recommendations[genre] = songs
+	}
+
+	return recommendations, nil
+}
+
+// AddFavorite agrega una canción favorita para un usuario
+func AddFavorite(userID, songID string) error {
+	query := "INSERT INTO user_favorites (user_id, song_id) VALUES (?, ?)"
+	_, err := db.Exec(query, userID, songID)
+	return err
+}
+
+// GetFavorites obtiene las canciones favoritas de un usuario
+func GetFavorites(userID string) ([]map[string]string, error) {
+	query := `
+		SELECT songs.id, songs.title, songs.artist 
+		FROM songs
+		JOIN user_favorites ON songs.id = user_favorites.song_id
+		WHERE user_favorites.user_id = ?`
+
+	rows, err := db.Query(query, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var favorites []map[string]string
+	for rows.Next() {
+		var id, title, artist string
+		if err := rows.Scan(&id, &title, &artist); err != nil {
+			return nil, err
+		}
+		favorites = append(favorites, map[string]string{
+			"id":     id,
+			"title":  title,
+			"artist": artist,
+		})
+	}
+	return favorites, nil
 }

@@ -1,10 +1,11 @@
-// Backend/models/song.go
-/*Autores: Henry Aliaga / Ismael Espinoza
+/*
+Autores: Henry Aliaga / Ismael Espinoza
 Fecha: 21/11/2024
 Lenguaje: Golang
-Descipcion: Asignacion de la clase song, con sus respectivas
+Descripcion: Asignacion de la clase song, con sus respectivas
 funciones para el manejo de datos
-(para la estructura de datos)*/
+(para la estructura de datos)
+*/
 package models
 
 import (
@@ -13,6 +14,7 @@ import (
 	"time"
 )
 
+// Estructura de la canción
 type Song struct {
 	ID         int       `json:"id"`
 	Title      string    `json:"title"`
@@ -22,6 +24,7 @@ type Song struct {
 	AddedAt    time.Time `json:"added_at"`
 	PlayCount  int       `json:"play_count"`
 	LastPlayed time.Time `json:"last_played"`
+	IsFavorite bool      `json:"is_favorite"` // Nuevo campo
 }
 
 // Constructor para Song
@@ -31,12 +34,13 @@ func NewSong(id int, title, artist, genre string, fileSize int) (*Song, error) {
 	}
 
 	song := &Song{
-		ID:       id,
-		Title:    title,
-		Artist:   artist,
-		Genre:    genre,
-		FileSize: fileSize,
-		AddedAt:  time.Now(),
+		ID:         id,
+		Title:      title,
+		Artist:     artist,
+		Genre:      genre,
+		FileSize:   fileSize,
+		AddedAt:    time.Now(),
+		IsFavorite: false, // Inicialmente no es favorita
 	}
 
 	if err := song.ValidateSize(); err != nil {
@@ -46,7 +50,7 @@ func NewSong(id int, title, artist, genre string, fileSize int) (*Song, error) {
 	return song, nil
 }
 
-// ValidateSize  Se asegura que la canción no sea más grande de 10MB antes de agregarla
+// ValidateSize Se asegura que la canción no sea más grande de 10MB antes de agregarla
 func (s *Song) ValidateSize() error {
 	const MaxSize = 10 * 1024 * 1024 // 10MB en bytes
 	if s.FileSize > MaxSize {
@@ -55,12 +59,7 @@ func (s *Song) ValidateSize() error {
 	return nil
 }
 
-/*
-	Getters entre ellos el GetTitle nos devuelve  el nombre de la canción
-
-GetArtist nos devuelve el nombre de la canción, Nos dice quién es el artista de la canción
-Nos indica qué tipo de música es (rock, pop, etc.)
-*/
+// Getters
 func (s *Song) GetTitle() string {
 	return s.Title
 }
@@ -73,7 +72,7 @@ func (s *Song) GetGenre() string {
 	return s.Genre
 }
 
-// Metodos adicionales para el manejo de la data
+// Métodos adicionales
 
 // GetFormattedFileSize Muestra el tamaño del archivo
 func (s *Song) GetFormattedFileSize() string {
@@ -91,17 +90,21 @@ func (s *Song) GetFormattedFileSize() string {
 
 // GetInfo Junta toda la información importante de la canción en un solo texto
 func (s *Song) GetInfo() string {
-	return fmt.Sprintf("ID: %d\nTítulo: %s\nArtista: %s\nGénero: %s\nTamaño: %s\nReproducciones: %d",
-		s.ID, s.Title, s.Artist, s.Genre, s.GetFormattedFileSize(), s.PlayCount)
+	favoriteStatus := "No"
+	if s.IsFavorite {
+		favoriteStatus = "Sí"
+	}
+	return fmt.Sprintf("ID: %d\nTítulo: %s\nArtista: %s\nGénero: %s\nTamaño: %s\nReproducciones: %d\nFavorito: %s",
+		s.ID, s.Title, s.Artist, s.Genre, s.GetFormattedFileSize(), s.PlayCount, favoriteStatus)
 }
 
-// IncrementPlayCount  Suma uno al contador cada vez que se reproduce la canción
+// IncrementPlayCount Suma uno al contador cada vez que se reproduce la canción
 func (s *Song) IncrementPlayCount() {
 	s.PlayCount++
 	s.LastPlayed = time.Now()
 }
 
-// UpdateMetadata  Permite cambiar la información básica de la canción
+// UpdateMetadata Permite cambiar la información básica de la canción
 func (s *Song) UpdateMetadata(title, artist, genre string) error {
 	if title != "" {
 		s.Title = title
@@ -121,4 +124,9 @@ func (s *Song) MatchesSearch(query string) bool {
 	return strings.Contains(strings.ToLower(s.Title), query) ||
 		strings.Contains(strings.ToLower(s.Artist), query) ||
 		strings.Contains(strings.ToLower(s.Genre), query)
+}
+
+// ToggleFavorite Cambia el estado de favorito de la canción
+func (s *Song) ToggleFavorite() {
+	s.IsFavorite = !s.IsFavorite
 }

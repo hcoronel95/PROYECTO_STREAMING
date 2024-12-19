@@ -1,5 +1,3 @@
-//(para el manejo de rutas/endpoints)
-
 // Backend/models/handlers/user.go
 /*Autores: Henry Aliaga / Ismael Espinoza
 Fecha: 05/12/2024
@@ -111,4 +109,56 @@ func (h *UserHandler) GetUserProfile(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(user)
+}
+
+// Nuevo endpoint: Obtener recomendaciones personalizadas para el usuario
+func (h *UserHandler) GetUserRecommendations(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Obtener el ID del usuario de los parámetros de consulta
+	userID := r.URL.Query().Get("id")
+	if userID == "" {
+		http.Error(w, "ID de usuario no proporcionado", http.StatusBadRequest)
+		return
+	}
+
+	// Consulta para obtener las recomendaciones basadas en las preferencias del usuario
+	rows, err := h.db.Query(`
+		SELECT s.id, s.title, s.artist, s.album
+		FROM user_preferences up
+		JOIN songs s ON up.song_id = s.id
+		WHERE up.user_id = ?`, userID)
+	if err != nil {
+		http.Error(w, "Error al obtener las recomendaciones", http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	// Construir las recomendaciones
+	var recommendations []struct {
+		ID     int    `json:"id"`
+		Title  string `json:"title"`
+		Artist string `json:"artist"`
+		Album  string `json:"album"`
+	}
+
+	for rows.Next() {
+		var song struct {
+			ID     int    `json:"id"`
+			Title  string `json:"title"`
+			Artist string `json:"artist"`
+			Album  string `json:"album"`
+		}
+		if err := rows.Scan(&song.ID, &song.Title, &song.Artist, &song.Album); err != nil {
+			http.Error(w, "Error al procesar las recomendaciones", http.StatusInternalServerError)
+			return
+		}
+		recommendations = append(recommendations, song)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(recommendations)
 }

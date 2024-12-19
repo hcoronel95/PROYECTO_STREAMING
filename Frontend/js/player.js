@@ -3,9 +3,11 @@ class MusicPlayer {
         this.currentSong = null;
         this.isPlaying = false;
         this.songList = [];
+        this.favorites = []; // Almacena las canciones favoritas del usuario
         this.albumCoverElement = document.getElementById('albumCover');
         this.initializeElements();
         this.loadSongs();
+        this.loadFavorites(); // Carga las canciones favoritas
         this.setupEventListeners();
     }
 
@@ -14,6 +16,7 @@ class MusicPlayer {
         this.prevBtn = document.getElementById('prevBtn');
         this.nextBtn = document.getElementById('nextBtn');
         this.songListElement = document.getElementById('songList');
+        this.favoritesListElement = document.getElementById('favoritesList'); // Nuevo para mostrar favoritos
         this.currentSongElement = document.getElementById('currentSong');
     }
 
@@ -35,6 +38,24 @@ class MusicPlayer {
         }
     }
 
+    async loadFavorites() {
+        try {
+            const response = await fetch('/api/favorites', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('userToken')}`
+                }
+            });
+            if (response.ok) {
+                this.favorites = await response.json();
+                this.renderFavorites();
+            } else {
+                console.error('Error al cargar favoritos:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error cargando favoritos:', error);
+        }
+    }
+
     renderSongList() {
         this.songListElement.innerHTML = this.songList.map(song => 
             `<div class="list-group-item song-list-item ${this.currentSong?.id === song.id ? 'active' : ''}"
@@ -44,8 +65,18 @@ class MusicPlayer {
                         <h6 class="mb-0">${song.title}</h6>
                         <small class="text-muted">${song.artist}</small>
                     </div>
-                    <span class="badge bg-secondary">${song.genre}</span>
+                    <button class="btn btn-sm btn-outline-secondary add-favorite-btn" data-id="${song.id}">
+                        ${this.favorites.some(fav => fav.id === song.id) ? '❤️' : '🤍'}
+                    </button>
                 </div>
+            </div>`).join('');
+    }
+
+    renderFavorites() {
+        this.favoritesListElement.innerHTML = this.favorites.map(song =>
+            `<div class="list-group-item">
+                <h6 class="mb-0">${song.title}</h6>
+                <small class="text-muted">${song.artist}</small>
             </div>`).join('');
     }
 
@@ -59,6 +90,12 @@ class MusicPlayer {
             if (songItem) {
                 const songId = parseInt(songItem.dataset.id);
                 this.playSong(songId);
+            }
+
+            const favoriteBtn = e.target.closest('.add-favorite-btn');
+            if (favoriteBtn) {
+                const songId = parseInt(favoriteBtn.dataset.id);
+                this.toggleFavorite(songId);
             }
         });
     }
@@ -82,6 +119,33 @@ class MusicPlayer {
             }
         } catch (error) {
             console.error('Error reproduciendo canción:', error);
+        }
+    }
+
+    async toggleFavorite(id) {
+        const isFavorite = this.favorites.some(song => song.id === id);
+
+        try {
+            const response = await fetch(`/api/favorites/${isFavorite ? 'remove' : 'add'}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('userToken')}`
+                },
+                body: JSON.stringify({ songId: id })
+            });
+
+            if (response.ok) {
+                this.favorites = isFavorite
+                    ? this.favorites.filter(song => song.id !== id)
+                    : [...this.favorites, this.songList.find(song => song.id === id)];
+                this.renderSongList();
+                this.renderFavorites();
+            } else {
+                console.error('Error al actualizar favoritos:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error actualizando favoritos:', error);
         }
     }
 

@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -20,8 +20,14 @@
         </div>
     </header>
 
-    <!-- Contenedor principal para las secciones Recomendaciones y Tu Música -->
+    <!-- Contenedor principal para las secciones Recomendaciones, Tu Música y Favoritos -->
     <main class="main-container">
+        
+        <!-- Nueva sección de recomendaciones -->
+        <div id="recommendations">
+            <h2>Your Recommendations</h2>
+        </div>
+
         <!-- Sección de recomendaciones -->
         <section class="recommendations">
             <h2>Recomendaciones de hoy:</h2>
@@ -55,6 +61,12 @@
                     <img src="../images/otros.jpg" alt="Otros">
                 </button>
             </div>
+        </section>
+
+        <!-- Nueva sección "Tus Favoritos" -->
+        <section class="favorites">
+            <h2>Tus Favoritos</h2>
+            <ul id="favorites-list"></ul>
         </section>
 
         <!-- Botón rojo "Salir" colocado a la derecha -->

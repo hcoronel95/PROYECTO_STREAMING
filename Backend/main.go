@@ -98,6 +98,32 @@ func (s *StreamingSystem) GetLibrary() ([]*models.Song, error) {
 	return songs, nil
 }
 
+// NUEVAS FUNCIONES INTEGRADAS
+func (s *StreamingSystem) AddFavorite(userID, songID int) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.library.AddFavorite(userID, songID)
+}
+
+func (s *StreamingSystem) RemoveFavorite(userID, songID int) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.library.RemoveFavorite(userID, songID)
+}
+
+func (s *StreamingSystem) SearchSongs(query string) ([]*models.Song, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	var results []*models.Song
+	for _, song := range s.library.Songs {
+		if strings.Contains(strings.ToLower(song.Title), strings.ToLower(query)) {
+			results = append(results, &song)
+		}
+	}
+	return results, nil
+}
+
 func initializeDatabase(db *sql.DB) error {
 	log.Println("Verificando usuarios existentes...")
 	var count int
@@ -229,6 +255,56 @@ func setupRoutes(sys *StreamingSystem) {
 	// Rutas de canciones
 	http.HandleFunc("/api/songs", authMiddleware(songHandler.GetSongs))
 	http.HandleFunc("/api/songs/add", adminMiddleware(songHandler.AddSong))
+
+	// Rutas de FAVORITOS
+	http.HandleFunc("/api/favorites/add", authMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		var req struct {
+			UserID int `json:"user_id"`
+			SongID int `json:"song_id"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "Petición inválida", http.StatusBadRequest)
+			return
+		}
+
+		if err := sys.AddFavorite(req.UserID, req.SongID); err != nil {
+			http.Error(w, "Error añadiendo favorito", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+	}))
+
+	http.HandleFunc("/api/favorites/remove", authMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		var req struct {
+			UserID int `json:"user_id"`
+			SongID int `json:"song_id"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "Petición inválida", http.StatusBadRequest)
+			return
+		}
+
+		if err := sys.RemoveFavorite(req.UserID, req.SongID); err != nil {
+			http.Error(w, "Error eliminando favorito", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+	}))
+
+	/* Rutas de BUSQUEDA
+	http.HandleFunc("/api/songs/search", authMiddleware(func(w http.ResponseWriter, r *http.Request) {
+		query := r.URL.Query().Get("q")
+		if query == "" {
+			http.Error(w, "Parámetro de búsqueda requerido", http.StatusBadRequest)
+			return
+		}
+
+		results, _ := sys.SearchSongs(query)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(results)
+	}))*/
 
 	// Rutas de reproducción
 	http.HandleFunc("/api/songs/play/", authMiddleware(func(w http.ResponseWriter, r *http.Request) {

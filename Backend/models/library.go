@@ -1,10 +1,11 @@
-// Backend/models/library.go
-/*Autores: Henry Aliaga / Ismael Espinoza
+/*
+Autores: Henry Aliaga / Ismael Espinoza
 Fecha: 21/11/2024
 Lenguaje: Golang
-Descipcion: Asignacion de la clase library , con sus respectivas
-funciones para el manejo de datos
-(para la estructura de datos)*/
+Descripción: Asignación de la clase Library con sus respectivas
+funciones para el manejo de datos, incluyendo favoritos y búsqueda.
+*/
+
 package models
 
 import (
@@ -19,7 +20,8 @@ type Library struct {
 	ID          int               `json:"id"`
 	UserID      int               `json:"user_id"`
 	Songs       []Song            `json:"songs"`
-	SongMap     map[string][]Song // Organización por género
+	SongMap     map[string][]Song `json:"song_map"`
+	Favorites   map[int][]int     `json:"favorites"` // Mapa de favoritos por usuario
 	CreatedAt   time.Time         `json:"created_at"`
 	LastUpdated time.Time         `json:"last_updated"`
 	TotalSize   int64             `json:"total_size"` // Tamaño total en bytes
@@ -27,7 +29,7 @@ type Library struct {
 
 const (
 	MaxSongs    = 60               // Límite máximo de canciones
-	MaxSongSize = 10 * 1024 * 1024 // 10MB en bytes
+	MaxSongSize = 10 * 1024 * 1024 // 10 MB en bytes
 )
 
 // NewLibrary crea una nueva instancia de Library
@@ -36,6 +38,7 @@ func NewLibrary(userID int) *Library {
 		UserID:      userID,
 		Songs:       make([]Song, 0),
 		SongMap:     make(map[string][]Song),
+		Favorites:   make(map[int][]int),
 		CreatedAt:   time.Now(),
 		LastUpdated: time.Now(),
 		TotalSize:   0,
@@ -70,9 +73,67 @@ func (l *Library) AddSong(song Song) error {
 	return nil
 }
 
-// GetSongsByGenre retorna todas las canciones de un género específico
-func (l *Library) GetSongsByGenre(genre string) []Song {
-	return l.SongMap[genre]
+// AddFavorite agrega una canción a los favoritos de un usuario
+func (l *Library) AddFavorite(userID, songID int) error {
+	// Verificar si la canción está en la biblioteca
+	_, err := l.GetSongByID(songID)
+	if err != nil {
+		return fmt.Errorf("la canción no se encuentra en la biblioteca")
+	}
+
+	// Agregar la canción a la lista de favoritos del usuario
+	if _, exists := l.Favorites[userID]; !exists {
+		l.Favorites[userID] = []int{}
+	}
+	l.Favorites[userID] = append(l.Favorites[userID], songID)
+	l.LastUpdated = time.Now()
+	return nil
+}
+
+// RemoveFavorite elimina una canción de los favoritos de un usuario
+func (l *Library) RemoveFavorite(userID, songID int) error {
+	// Verificar si la canción está en la biblioteca
+	_, err := l.GetSongByID(songID)
+	if err != nil {
+		return fmt.Errorf("la canción no se encuentra en la biblioteca")
+	}
+
+	// Eliminar la canción de la lista de favoritos
+	if _, exists := l.Favorites[userID]; exists {
+		for i, id := range l.Favorites[userID] {
+			if id == songID {
+				l.Favorites[userID] = append(l.Favorites[userID][:i], l.Favorites[userID][i+1:]...)
+				break
+			}
+		}
+	}
+
+	l.LastUpdated = time.Now()
+	return nil
+}
+
+// GetSongByID busca una canción por su ID
+func (l *Library) GetSongByID(id int) (*Song, error) {
+	for _, song := range l.Songs {
+		if song.ID == id {
+			return &song, nil
+		}
+	}
+	return nil, errors.New("canción no encontrada")
+}
+
+// SearchSongs busca canciones por título, artista o género
+func (l *Library) SearchSongs(query string) []Song {
+	var results []Song
+	query = strings.ToLower(query)
+	for _, song := range l.Songs {
+		if strings.Contains(strings.ToLower(song.Title), query) ||
+			strings.Contains(strings.ToLower(song.Artist), query) ||
+			strings.Contains(strings.ToLower(song.Genre), query) {
+			results = append(results, song)
+		}
+	}
+	return results
 }
 
 // RemoveSong elimina una canción de la biblioteca
@@ -99,80 +160,6 @@ func (l *Library) RemoveSong(songID int) error {
 		}
 	}
 	return errors.New("canción no encontrada")
-}
-
-// SearchSongs busca canciones por título, artista o género
-func (l *Library) SearchSongs(query string) []Song {
-	var results []Song
-	query = strings.ToLower(query)
-
-	for _, song := range l.Songs {
-		if strings.Contains(strings.ToLower(song.Title), query) ||
-			strings.Contains(strings.ToLower(song.Artist), query) ||
-			strings.Contains(strings.ToLower(song.Genre), query) {
-			results = append(results, song)
-		}
-	}
-	return results
-}
-
-// GetLibraryStats retorna estadísticas de la biblioteca
-func (l *Library) GetLibraryStats() map[string]interface{} {
-	stats := make(map[string]interface{})
-
-	// Estadísticas básicas
-	stats["total_songs"] = len(l.Songs)
-	stats["total_size_mb"] = float64(l.TotalSize) / (1024 * 1024)
-	stats["available_slots"] = MaxSongs - len(l.Songs)
-
-	// Conteo por género
-	genreCounts := make(map[string]int)
-	for genre := range l.SongMap {
-		genreCounts[genre] = len(l.SongMap[genre])
-	}
-	stats["songs_per_genre"] = genreCounts
-
-	return stats
-}
-
-// GetAvailableSpace retorna el espacio disponible en MB
-func (l *Library) GetAvailableSpace() float64 {
-	totalAllowed := int64(MaxSongs * MaxSongSize)
-	available := totalAllowed - l.TotalSize
-	return float64(available) / (1024 * 1024)
-}
-
-// GetGenres retorna la lista de géneros únicos en la biblioteca
-func (l *Library) GetGenres() []string {
-	genres := make([]string, 0, len(l.SongMap))
-	for genre := range l.SongMap {
-		genres = append(genres, genre)
-	}
-	return genres
-}
-
-// GetSongByID busca una canción por su ID
-func (l *Library) GetSongByID(id int) (*Song, error) {
-	for _, song := range l.Songs {
-		if song.ID == id {
-			return &song, nil
-		}
-	}
-	return nil, errors.New("canción no encontrada")
-}
-
-// ValidateLibraryLimits verifica si la biblioteca está dentro de los límites permitidos
-func (l *Library) ValidateLibraryLimits() error {
-	if len(l.Songs) > MaxSongs {
-		return fmt.Errorf("la biblioteca excede el límite de %d canciones", MaxSongs)
-	}
-
-	maxTotalSize := int64(MaxSongs * MaxSongSize)
-	if l.TotalSize > maxTotalSize {
-		return fmt.Errorf("la biblioteca excede el límite de tamaño de %d MB", maxTotalSize/(1024*1024))
-	}
-
-	return nil
 }
 
 // FormatLastUpdated retorna la fecha de última actualización en formato legible

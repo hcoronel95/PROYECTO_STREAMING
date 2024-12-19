@@ -64,3 +64,12 @@ INSERT INTO users (name, email, password, role) VALUES
 ('Juan Perez', 'juan.perez@example.com', 'password123', 'user'),
 ('Ana Gomez', 'ana.gomez@example.com', 'securepass456', 'user'),
 ('Carlos Lopez', 'carlos.lopez@example.com', 'qwerty789', 'user');
+
+-- Tabla de favoritos
+CREATE TABLE user_favorites (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id VARCHAR(255) NOT NULL,
+    song_id VARCHAR(255) NOT NULL,
+    FOREIGN KEY (song_id) REFERENCES songs(id),
+    UNIQUE (user_id, song_id) -- Evita duplicados para el mismo usuario y canción
+);
