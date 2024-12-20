@@ -1,13 +1,12 @@
 class MusicPlayer {
     constructor() {
         this.currentSong = null;
+        this.audio = new Audio();
+        this.songs = [];
         this.isPlaying = false;
-        this.songList = [];
-        this.favorites = []; // Almacena las canciones favoritas del usuario
         this.albumCoverElement = document.getElementById('albumCover');
         this.initializeElements();
         this.loadSongs();
-        this.loadFavorites(); // Carga las canciones favoritas
         this.setupEventListeners();
     }
 
@@ -16,20 +15,22 @@ class MusicPlayer {
         this.prevBtn = document.getElementById('prevBtn');
         this.nextBtn = document.getElementById('nextBtn');
         this.songListElement = document.getElementById('songList');
-        this.favoritesListElement = document.getElementById('favoritesList'); // Nuevo para mostrar favoritos
         this.currentSongElement = document.getElementById('currentSong');
+        this.currentArtistElement = document.getElementById('currentArtist');
     }
 
     async loadSongs() {
         try {
-            const response = await fetch('/api/songs', {
+            const response = await fetch('/api/songs/list', {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('userToken')}`
                 }
             });
+            
             if (response.ok) {
-                this.songList = await response.json();
-                this.renderSongList();
+                this.songs = await response.json();
+                console.log('Canciones cargadas:', this.songs);
+                this.displaySongs(this.songs);
             } else {
                 console.error('Error al cargar canciones:', response.statusText);
             }
@@ -38,147 +39,115 @@ class MusicPlayer {
         }
     }
 
-    async loadFavorites() {
-        try {
-            const response = await fetch('/api/favorites', {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('userToken')}`
-                }
-            });
-            if (response.ok) {
-                this.favorites = await response.json();
-                this.renderFavorites();
-            } else {
-                console.error('Error al cargar favoritos:', response.statusText);
-            }
-        } catch (error) {
-            console.error('Error cargando favoritos:', error);
-        }
-    }
+    displaySongs(songs) {
+        const musicList = document.querySelector('.song-list-container');
+        if (!musicList) return;
 
-    renderSongList() {
-        this.songListElement.innerHTML = this.songList.map(song => 
-            `<div class="list-group-item song-list-item ${this.currentSong?.id === song.id ? 'active' : ''}"
-                 data-id="${song.id}">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="mb-0">${song.title}</h6>
-                        <small class="text-muted">${song.artist}</small>
-                    </div>
-                    <button class="btn btn-sm btn-outline-secondary add-favorite-btn" data-id="${song.id}">
-                        ${this.favorites.some(fav => fav.id === song.id) ? '❤️' : '🤍'}
-                    </button>
+        const songItems = songs.map((song, index) => `
+            <div class="song-item" data-index="${index}">
+                <img src="../images/music-cover.jpg" alt="${song.title}" class="custom-img-size">
+                <div class="song-info">
+                    <h3>${song.title}</h3>
+                    <p>${song.artist}</p>
+                    <p>${song.genre}</p>
                 </div>
-            </div>`).join('');
-    }
+            </div>
+        `).join('');
 
-    renderFavorites() {
-        this.favoritesListElement.innerHTML = this.favorites.map(song =>
-            `<div class="list-group-item">
-                <h6 class="mb-0">${song.title}</h6>
-                <small class="text-muted">${song.artist}</small>
-            </div>`).join('');
-    }
+        musicList.innerHTML = songItems;
 
-    setupEventListeners() {
-        this.playBtn.addEventListener('click', () => this.togglePlay());
-        this.prevBtn.addEventListener('click', () => this.playPrevious());
-        this.nextBtn.addEventListener('click', () => this.playNext());
-        
-        this.songListElement.addEventListener('click', (e) => {
-            const songItem = e.target.closest('.song-list-item');
-            if (songItem) {
-                const songId = parseInt(songItem.dataset.id);
-                this.playSong(songId);
-            }
-
-            const favoriteBtn = e.target.closest('.add-favorite-btn');
-            if (favoriteBtn) {
-                const songId = parseInt(favoriteBtn.dataset.id);
-                this.toggleFavorite(songId);
-            }
+        // Agregar event listeners a las canciones
+        document.querySelectorAll('.song-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const index = parseInt(item.dataset.index);
+                this.playSong(index);
+            });
         });
     }
 
-    async playSong(id) {
-        try {
-            const response = await fetch(`/api/songs/play/${id}`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('userToken')}`
-                }
+    playSong(index) {
+        if (index < 0 || index >= this.songs.length) return;
+        
+        const song = this.songs[index];
+        this.currentSong = index;
+        
+        // Construir la URL completa para el archivo de audio
+        const fileName = song.file_path.split('\\').pop(); // Manejar rutas de Windows
+        const audioUrl = `/uploads/songs/${fileName}`;
+        console.log('Intentando reproducir:', audioUrl);
+        
+        // Actualizar interfaz
+        if (this.currentSongElement) this.currentSongElement.textContent = song.title;
+        if (this.currentArtistElement) this.currentArtistElement.textContent = song.artist;
+        if (this.albumCoverElement) this.albumCoverElement.src = '../images/music-cover.jpg';
+        
+        this.audio.src = audioUrl;
+        this.audio.play()
+            .catch(error => {
+                console.error('Error reproduciendo canción:', error);
             });
-
-            if (response.ok) {
-                this.currentSong = this.songList.find(song => song.id === id);
-                this.isPlaying = true;
-                this.albumCoverElement.src = `/path/to/song-${this.currentSong.id}-cover.jpg`;
-                this.updatePlayerUI();
-            } else {
-                console.error('Error al reproducir canción:', response.statusText);
-            }
-        } catch (error) {
-            console.error('Error reproduciendo canción:', error);
-        }
-    }
-
-    async toggleFavorite(id) {
-        const isFavorite = this.favorites.some(song => song.id === id);
-
-        try {
-            const response = await fetch(`/api/favorites/${isFavorite ? 'remove' : 'add'}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('userToken')}`
-                },
-                body: JSON.stringify({ songId: id })
-            });
-
-            if (response.ok) {
-                this.favorites = isFavorite
-                    ? this.favorites.filter(song => song.id !== id)
-                    : [...this.favorites, this.songList.find(song => song.id === id)];
-                this.renderSongList();
-                this.renderFavorites();
-            } else {
-                console.error('Error al actualizar favoritos:', response.statusText);
-            }
-        } catch (error) {
-            console.error('Error actualizando favoritos:', error);
-        }
+        
+        this.isPlaying = true;
+        this.updatePlayButton();
     }
 
     togglePlay() {
-        if (!this.currentSong) return;
-        this.isPlaying = !this.isPlaying;
-        this.updatePlayerUI();
+        if (this.audio.paused) {
+            this.audio.play()
+                .catch(error => {
+                    console.error('Error reproduciendo:', error);
+                });
+            this.isPlaying = true;
+        } else {
+            this.audio.pause();
+            this.isPlaying = false;
+        }
+        this.updatePlayButton();
     }
 
-    playPrevious() {
-        const index = this.songList.findIndex(song => song.id === this.currentSong.id);
-        if (index > 0) this.playSong(this.songList[index - 1].id);
+    updatePlayButton() {
+        if (this.playBtn) {
+            this.playBtn.textContent = this.isPlaying ? '⏸' : '▶';
+        }
     }
 
     playNext() {
-        const index = this.songList.findIndex(song => song.id === this.currentSong.id);
-        if (index < this.songList.length - 1) this.playSong(this.songList[index + 1].id);
+        if (this.currentSong !== null) {
+            const nextIndex = (this.currentSong + 1) % this.songs.length;
+            this.playSong(nextIndex);
+        }
     }
 
-    updatePlayerUI() {
-        this.playBtn.textContent = this.isPlaying ? '⏸' : '▶';
-        this.currentSongElement.textContent = this.currentSong ? `${this.currentSong.title} - ${this.currentSong.artist}` : 'No hay canción seleccionada';
-        this.renderSongList();
+    playPrevious() {
+        if (this.currentSong !== null) {
+            const prevIndex = (this.currentSong - 1 + this.songs.length) % this.songs.length;
+            this.playSong(prevIndex);
+        }
+    }
+
+    setupEventListeners() {
+        if (this.playBtn) {
+            this.playBtn.addEventListener('click', () => this.togglePlay());
+        }
+        if (this.prevBtn) {
+            this.prevBtn.addEventListener('click', () => this.playPrevious());
+        }
+        if (this.nextBtn) {
+            this.nextBtn.addEventListener('click', () => this.playNext());
+        }
+
+        // Evento para cuando termine la canción
+        this.audio.addEventListener('ended', () => this.playNext());
     }
 }
 
-// Inicializar el MusicPlayer al cargar el DOM
+// Inicializar el reproductor cuando se cargue el DOM
 document.addEventListener('DOMContentLoaded', () => {
-    new MusicPlayer();
+    const player = new MusicPlayer();
 });
 
 // Evento para el botón de logout
-document.querySelector(".logout-btn").addEventListener("click", () => {
+document.querySelector(".logout-btn")?.addEventListener("click", () => {
     if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
         fetch("/api/logout", {
             method: "POST",
@@ -186,8 +155,8 @@ document.querySelector(".logout-btn").addEventListener("click", () => {
         })
             .then((response) => {
                 if (response.ok) {
-                    alert("Sesión cerrada exitosamente.");
-                    window.location.href = "/"; // Redirige al inicio
+                    localStorage.removeItem('userToken');
+                    window.location.href = "/";
                 } else {
                     alert("Error cerrando sesión.");
                 }

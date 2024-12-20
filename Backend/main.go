@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -224,11 +225,39 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 // Middleware para verificar el rol de administrador
 func adminMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		token := r.Header.Get("Authorization")
-		if token != "admin-token" { // Verificación de token de administrador
-			http.Error(w, "Acceso no autorizado", http.StatusForbidden)
+		// Configurar CORS
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		// Manejar preflight OPTIONS request
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
 			return
 		}
+
+		// Obtener token
+		authHeader := r.Header.Get("Authorization")
+		if authHeader == "" {
+			http.Error(w, "No autorizado", http.StatusUnauthorized)
+			return
+		}
+
+		// Extraer token
+		tokenParts := strings.Split(authHeader, " ")
+		if len(tokenParts) != 2 || tokenParts[0] != "Bearer" {
+			http.Error(w, "Formato de token inválido", http.StatusUnauthorized)
+			return
+		}
+
+		token := tokenParts[1]
+
+		// Validar token de admin (simplificado para el ejemplo)
+		if !strings.HasPrefix(token, "admin-token") {
+			http.Error(w, "No tienes permisos de administrador", http.StatusForbidden)
+			return
+		}
+
 		next(w, r)
 	}
 }
@@ -244,6 +273,9 @@ func setupRoutes(sys *StreamingSystem) {
 	fs := http.FileServer(http.Dir("../Frontend"))
 	http.Handle("/", http.StripPrefix("/", fs))
 
+	// Manejo de archivos de música
+	http.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads"))))
+
 	// Rutas de autenticación
 	http.HandleFunc("/api/login", authHandler.Login)
 	http.HandleFunc("/api/logout", authHandler.Logout)
@@ -255,6 +287,32 @@ func setupRoutes(sys *StreamingSystem) {
 	// Rutas de canciones
 	http.HandleFunc("/api/songs", authMiddleware(songHandler.GetSongs))
 	http.HandleFunc("/api/songs/add", adminMiddleware(songHandler.AddSong))
+
+	//RUTA DE CONFIGURACION CORS Y OPTIONS
+	http.HandleFunc("/api/songs/upload", func(w http.ResponseWriter, r *http.Request) {
+		// Configurar CORS
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		// Manejar preflight OPTIONS request
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		// Verificar rol de administrador
+		token := r.Header.Get("Authorization")
+		if !strings.HasPrefix(token, "Bearer admin-token") {
+			http.Error(w, "No autorizado", http.StatusUnauthorized)
+			return
+		}
+
+		songHandler.UploadSong(w, r)
+	})
+	//RUTAS PARA OBTENCION DE CANCIONES
+
+	http.HandleFunc("/api/songs/list", authMiddleware(songHandler.GetSongs))
 
 	// Rutas de FAVORITOS
 	http.HandleFunc("/api/favorites/add", authMiddleware(func(w http.ResponseWriter, r *http.Request) {
@@ -405,6 +463,10 @@ func main() {
 		log.Fatalf("Error inicializando datos: %v", err)
 	}
 	log.Println("Base de datos inicializada correctamente")
+
+	if err := os.MkdirAll("./uploads/songs", 0755); err != nil {
+		log.Printf("Error creando directorio de uploads: %v", err)
+	}
 
 	// Crear instancia del sistema
 	sys, err := NewStreamingSystem(db)

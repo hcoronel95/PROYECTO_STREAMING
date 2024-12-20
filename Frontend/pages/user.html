@@ -7,10 +7,13 @@
     <link rel="stylesheet" href="../css/userinterface.css">
 </head>
 <body>
-    <!-- Botón de lupa en la esquina superior derecha -->
-    <button class="search-button" title="Buscar">
-        🔍
-    </button>
+    <!-- Barra de  busqueda en la esquina superior derecha -->
+    <div class="search-container">
+        <input type="text" class="search-input" placeholder="Buscar canciones...">
+        <button class="search-button" title="Buscar">
+            🔍
+        </button>
+    </div>
 
     <!-- Encabezado con información del usuario -->
     <header>
@@ -32,13 +35,13 @@
         <section class="recommendations">
             <h2>Recomendaciones de hoy:</h2>
             <div class="recommendation-list">
-                <button class="music-button" title="Nirvana">
+                <button class="music-button" title="Nirvana" onclick="window.location.href='player.html'">
                     <img src="../images/nirvana.jpg" alt="Nirvana">
                 </button>
-                <button class="music-button" title="The Beatles">
+                <button class="music-button" title="The Beatles" onclick="window.location.href='player.html'">
                     <img src="../images/beatles.jpg" alt="The Beatles">
                 </button>
-                <button class="music-button" title="Queen">
+                <button class="music-button" title="Queen" onclick="window.location.href='player.html'">
                     <img src="../images/queen.jpg" alt="Queen">
                 </button>
             </div>
@@ -48,16 +51,16 @@
         <section class="your-music">
             <h2>Tu Música</h2>
             <div class="music-list">
-                <button class="music-button" title="Metallica">
+                <button class="music-button" title="Metallica" onclick="window.location.href='player.html'">
                     <img src="../images/metallica.jpg" alt="Metallica">
                 </button>
-                <button class="music-button" title="Black Metal">
+                <button class="music-button" title="Black Metal" onclick="window.location.href='player.html'">
                     <img src="../images/blackmetal.jpg" alt="Black Metal">
                 </button>
-                <button class="music-button" title="Misfits">
+                <button class="music-button" title="Misfits" onclick="window.location.href='player.html'">
                     <img src="../images/misfits.jpg" alt="Misfits">
                 </button>
-                <button class="music-button" title="Otros">
+                <button class="music-button" title="Otros" onclick="window.location.href='player.html'">
                     <img src="../images/otros.jpg" alt="Otros">
                 </button>
             </div>

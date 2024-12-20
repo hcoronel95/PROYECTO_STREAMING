@@ -141,3 +141,152 @@ footer a {
 footer a:hover {
     text-decoration: underline;
 }
+
+.song-item {
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.song-info {
+    text-align: center;
+    margin-top: 10px;
+    color: white;
+}
+
+/* Estilos para las canciones */
+.song-item {
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+.song-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+.song-info {
+    text-align: center;
+    margin-top: 10px;
+    color: white;
+}
+
+/* Barra de búsqueda mejorada */
+.search-container {
+    position: absolute;
+    top: 20px;
+    right: 80px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    border-radius: 25px;
+}
+
+.search-input {
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 5px 15px;
+    width: 200px;
+    font-size: 16px;
+}
+
+.search-input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.search-input:focus {
+    outline: none;
+}
+
+/* Reproductor de música */
+.music-player {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.9);
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.player-controls {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.player-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 24px;
+    transition: transform 0.2s;
+}
+
+.player-btn:hover {
+    transform: scale(1.1);
+    color: #FFD700;
+}
+
+.now-playing {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.now-playing img {
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+}
+
+.song-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.song-title {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.song-artist {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.progress-bar {
+    flex-grow: 1;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    margin: 0 20px;
+    cursor: pointer;
+    position: relative;
+}
+
+.progress {
+    height: 100%;
+    background: #FFD700;
+    border-radius: 5px;
+    width: 0%;
+    transition: width 0.1s linear;
+}

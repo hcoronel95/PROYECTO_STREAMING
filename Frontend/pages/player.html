@@ -12,20 +12,13 @@
     <header class="bg-dark text-white py-2 px-4 d-flex justify-content-between align-items-center shadow">
         <h4 class="mb-0">Streaming Music</h4>
         <nav class="d-flex align-items-center">
-            <button onclick="window.location.href='user.html';" 
-            class="custom-btn">
-        Inicio
-    </button>
-    <button onclick="window.location.href='desarrollo.html';" 
-    class="custom-btn">
-Perfil
-</button>
+            <button onclick="window.location.href='user.html';" class="custom-btn">Inicio</button>
+            <button onclick="window.location.href='desarrollo.html';" class="custom-btn">Perfil</button>
         </nav>
-        <!-- Botón de Cerrar Sesión -->
         <button class="logout-btn">Cerrar sesión</button>
     </header>
 
-    <!-- Barra de búsqueda debajo del encabezado -->
+    <!-- Barra de búsqueda -->
     <div class="container mt-4">
         <div class="card bg-dark text-white shadow">
             <div class="card-header">
@@ -38,43 +31,20 @@ Perfil
         </div>
     </div>
 
-    <!-- Contenedor de biblioteca debajo de la barra de búsqueda -->
+    <!-- Lista de canciones -->
     <div class="container mt-4">
         <div class="card bg-dark text-white shadow">
             <div class="card-header">
                 <h5 class="mb-0">Biblioteca</h5>
             </div>
             <div class="card-body song-list-container">
-                <div class="row">
-                    <!-- Imagen de Metallica -->
-                    <div class="col-md-3 mb-4">
-                        <img src="../images/metallica.jpg" alt="Metallica" title="Metallica" class="img-fluid rounded custom-img-size">
-                    </div>
-                    <!-- Imagen de Black Metal -->
-                    <div class="col-md-3 mb-4">
-                        <img src="../images/blackmetal.jpg" alt="Black Metal" title="Black Metal" class="img-fluid rounded custom-img-size">
-                    </div>
-                    <!-- Imagen de Misfits -->
-                    <div class="col-md-3 mb-4">
-                        <img src="../images/misfits.jpg" alt="Misfits" title="Misfits" class="img-fluid rounded custom-img-size">
-                    </div>
-                    <!-- Imagen de Otros -->
-                    <div class="col-md-3 mb-4">
-                        <img src="../images/nirvana.jpg" alt="Nirvana" title="Nirvana" class="img-fluid rounded custom-img-size">
-                    </div>
-                </div>
+                <!-- Las canciones se cargarán dinámicamente aquí -->
             </div>
         </div>
     </div>
 
-    <!-- Contenedor principal (vacío) -->
-    <div class="container-fluid d-flex" style="height: calc(100vh - 150px);">
-        <div class="col-md-3 p-3"></div> <!-- Aquí se puede agregar algo más si es necesario -->
-        <div class="col-md-9"></div>
-    </div>
-
-    <!-- Reproductor fijo inferior -->
-    <div class="player-bar fixed-bottom bg-dark text-white p-3">
+    <!-- Reproductor -->
+    <div class="player-bar fixed-bottom">
         <div class="container d-flex justify-content-center align-items-center">
             <div class="d-flex align-items-center">
                 <img src="../images/fondonota.jpg" id="albumCover" class="rounded me-3" alt="Portada" style="width: 50px; height: 50px;">
@@ -84,11 +54,14 @@ Perfil
                 </div>
             </div>
 
-            <!-- Contenedor de botones centrados -->
             <div class="d-flex justify-content-center w-100">
                 <button class="btn btn-outline-light mx-2" id="prevBtn">⏮</button>
                 <button class="btn btn-primary mx-2" id="playBtn">▶</button>
                 <button class="btn btn-outline-light mx-2" id="nextBtn">⏭</button>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress"></div>
             </div>
         </div>
     </div>
