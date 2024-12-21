@@ -1,4 +1,3 @@
-// Backend/models/user.go
 /*Autores: Henry Aliaga / Ismael Espinoza
 Fecha: 22/11/2024
 Lenguaje: Golang
@@ -9,7 +8,10 @@ funciones para el manejo de datos
 package models
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
+	"time"
 )
 
 // Usuario representa a los consumidores.
@@ -18,6 +20,9 @@ type Usuario struct {
 	Nombre   string `json:"user_name"`     // Nombre del usuario
 	Email    string `json:"user_email"`    // Correo electrónico del usuario
 	Password string `json:"user_password"` // Contraseña del usuario
+	Token    string `json:"token"`         // Token generado para el usuario
+	ExpireAt string `json:"expire_at"`     // Fecha de expiración del token
+	Role     string `json:"user_role"`     // Rol del usuario (nuevo campo)
 }
 
 // NewUsuario crea una nueva instancia de Usuario con validación de campos.
@@ -34,6 +39,10 @@ func NewUsuario(id int, nombre, email, password string) (*Usuario, error) {
 		Email:    email,
 		Password: password,
 	}
+
+	// Generar un token único para el usuario y establecer expiración
+	usuario.Token = generarTokenUnico(email)
+	usuario.ExpireAt = time.Now().Add(24 * time.Hour).Format(time.RFC3339)
 
 	return usuario, nil
 }
@@ -70,4 +79,32 @@ func ValidarORegistrarUsuario(id int, nombre, email, password string) (*Usuario,
 // ObtenerUsuarios devuelve la lista de usuarios registrados.
 func ObtenerUsuarios() []Usuario {
 	return UsuariosRegistrados
+}
+
+// generarTokenUnico genera un token único y seguro para un usuario basado en su email.
+func generarTokenUnico(email string) string {
+	// Generar un token aleatorio
+	tokenBytes := make([]byte, 32)
+	rand.Read(tokenBytes)
+	randomToken := base64.URLEncoding.EncodeToString(tokenBytes)
+
+	return fmt.Sprintf("%s-%s", randomToken, email)
+}
+
+// ValidarToken verifica si un token es válido y devuelve el usuario correspondiente.
+func ValidarToken(token string) (*Usuario, error) {
+	for _, usuario := range UsuariosRegistrados {
+		if usuario.Token == token {
+			// Verificar si el token está expirado
+			expireAt, err := time.Parse(time.RFC3339, usuario.ExpireAt)
+			if err != nil {
+				return nil, fmt.Errorf("formato de fecha inválido para expiración del token")
+			}
+			if time.Now().After(expireAt) {
+				return nil, fmt.Errorf("el token ha expirado")
+			}
+			return &usuario, nil
+		}
+	}
+	return nil, fmt.Errorf("token inválido")
 }

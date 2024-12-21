@@ -443,6 +443,7 @@ func setupRoutes(sys *StreamingSystem) {
 	http.HandleFunc("/user", authMiddleware(func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "../Frontend/userinterface.html")
 	}))
+
 }
 
 func main() {
@@ -501,6 +502,17 @@ func main() {
 		}
 		log.Println("Canciones de ejemplo cargadas correctamente")
 	}
+
+	// Crear el manejador de autenticación
+	authHandler := handlers.NewAuthHandler(db)
+
+	// Ruta existente para obtener información del usuario
+	http.HandleFunc("/api/user-info", authHandler.GetUserInfo)
+
+	// Nueva funcionalidad añadida
+	http.HandleFunc("/api/new-endpoint", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Nueva funcionalidad añadida correctamente"))
+	})
 
 	// Iniciar servidor HTTP
 	port := ":8080"

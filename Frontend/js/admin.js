@@ -6,12 +6,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Gestión de usuarios
     document.getElementById("users").addEventListener("click", () => {
-        window.location.href = "/pages/desarrollo.html";
+        window.location.href = "/pages/gestorusuarios.html";
     });
 
     // Creación de reportes
     document.getElementById("reports").addEventListener("click", () => {
-        window.location.href = "/pages/desarrollo.html";
+        window.location.href = "/pages/reporte.html";
     });
 
     // Botón de Logout

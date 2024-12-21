@@ -10,67 +10,41 @@
     <!-- Barra de  busqueda en la esquina superior derecha -->
     <div class="search-container">
         <input type="text" class="search-input" placeholder="Buscar canciones...">
-        <button class="search-button" title="Buscar">
-            🔍
-        </button>
     </div>
 
-    <!-- Encabezado con información del usuario -->
-    <header>
-        <div class="user-info">
-            <img src="../images/user-avatar.jpg" alt="Avatar del Usuario" class="avatar">
-            <h2>Bienvenido, [JUAN PEREZ] </h2>
+<!-- Encabezado con información del usuario -->
+<header>
+    <div class="user-info">
+        <img src="../images/user-avatar.jpg" alt="Avatar del Usuario" class="avatar">
+        <h2 id="welcome-message">Bienvenido, cargando...</h2>
+    </div>
+</header>
+
+<!-- Contenedor principal para las secciones Recomendaciones, Tu Música y Favoritos -->
+<main class="main-container">
+    
+    <!-- Sección de recomendaciones -->
+    <section class="recommendations">
+        <h2>Biblioteca:</h2>
+        <div class="recommendation-list">
+            <button class="music-button" onclick="window.location.href='player.html'">
+                Clic aquí
+            </button>
         </div>
-    </header>
+    </section>
 
-    <!-- Contenedor principal para las secciones Recomendaciones, Tu Música y Favoritos -->
-    <main class="main-container">
-        
-        <!-- Nueva sección de recomendaciones -->
-        <div id="recommendations">
-            <h2>Your Recommendations</h2>
+    <!-- Sección "Tu Música" -->
+    <section class="your-music">
+        <h2>Reproducción de Música</h2>
+        <div class="music-list">
+            <button class="music-button" onclick="window.location.href='player.html'">
+                Clic aquí
+            </button>
         </div>
+    </section>
+</main>
 
-        <!-- Sección de recomendaciones -->
-        <section class="recommendations">
-            <h2>Recomendaciones de hoy:</h2>
-            <div class="recommendation-list">
-                <button class="music-button" title="Nirvana" onclick="window.location.href='player.html'">
-                    <img src="../images/nirvana.jpg" alt="Nirvana">
-                </button>
-                <button class="music-button" title="The Beatles" onclick="window.location.href='player.html'">
-                    <img src="../images/beatles.jpg" alt="The Beatles">
-                </button>
-                <button class="music-button" title="Queen" onclick="window.location.href='player.html'">
-                    <img src="../images/queen.jpg" alt="Queen">
-                </button>
-            </div>
-        </section>
 
-        <!-- Sección "Tu Música" -->
-        <section class="your-music">
-            <h2>Tu Música</h2>
-            <div class="music-list">
-                <button class="music-button" title="Metallica" onclick="window.location.href='player.html'">
-                    <img src="../images/metallica.jpg" alt="Metallica">
-                </button>
-                <button class="music-button" title="Black Metal" onclick="window.location.href='player.html'">
-                    <img src="../images/blackmetal.jpg" alt="Black Metal">
-                </button>
-                <button class="music-button" title="Misfits" onclick="window.location.href='player.html'">
-                    <img src="../images/misfits.jpg" alt="Misfits">
-                </button>
-                <button class="music-button" title="Otros" onclick="window.location.href='player.html'">
-                    <img src="../images/otros.jpg" alt="Otros">
-                </button>
-            </div>
-        </section>
-
-        <!-- Nueva sección "Tus Favoritos" -->
-        <section class="favorites">
-            <h2>Tus Favoritos</h2>
-            <ul id="favorites-list"></ul>
-        </section>
 
         <!-- Botón rojo "Salir" colocado a la derecha -->
         <button class="logout-button">Salir</button>

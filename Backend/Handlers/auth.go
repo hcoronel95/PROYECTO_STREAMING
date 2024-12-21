@@ -1,9 +1,9 @@
 // Backend/models/handlers/auth.go
-/*Autores: Henry Aliaga / Ismael Espinoza
+/* Autores: Henry Aliaga / Ismael Espinoza
 Fecha: 05/12/2024
 Lenguaje: Golang
-Descipcion: Asignacion de la clase auth, con sus respectivas
-funciones para el manejo de rutas
+Descripción: Asignación de la clase auth, con sus respectivas
+funciones para el manejo de rutas.
 */
 
 package handlers
@@ -32,6 +32,13 @@ type LoginResponse struct {
 	Role     string `json:"role"`
 	Token    string `json:"token"`
 	ExpireAt string `json:"expire_at"`
+}
+
+type UserInfo struct {
+	ID    int    `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
+	Role  string `json:"role"`
 }
 
 func NewAuthHandler(db *sql.DB) *AuthHandler {
@@ -94,8 +101,39 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Invalida el token en caso de ser necesario (por ejemplo para nuestro proyecto seria en la Base de datos)
+	// Invalida el token en caso de ser necesario (por ejemplo, para nuestro proyecto sería en la base de datos)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Sesión cerrada exitosamente"})
+}
+
+func (h *AuthHandler) GetUserInfo(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
+		return
+	}
+
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		http.Error(w, "Token no proporcionado", http.StatusUnauthorized)
+		return
+	}
+
+	token := authHeader[len("Bearer "):]
+
+	var user UserInfo
+	query := `SELECT id, name, email, role FROM users WHERE role || '-token-' || email = ?`
+
+	err := h.db.QueryRow(query, token).Scan(&user.ID, &user.Name, &user.Email, &user.Role)
+	if err == sql.ErrNoRows {
+		http.Error(w, "Token inválido o usuario no encontrado", http.StatusUnauthorized)
+		return
+	} else if err != nil {
+		log.Printf("Error en consulta SQL: %v", err)
+		http.Error(w, "Error interno del servidor", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(user)
 }
