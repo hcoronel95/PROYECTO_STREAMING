@@ -126,6 +126,9 @@ func (s *StreamingSystem) SearchSongs(query string) ([]*models.Song, error) {
 }
 
 func initializeDatabase(db *sql.DB) error {
+	log.Println("Iniciando inicialización de la base de datos...")
+
+	// 1. Inicialización de usuarios
 	log.Println("Verificando usuarios existentes...")
 	var count int
 	err := db.QueryRow("SELECT COUNT(*) FROM users").Scan(&count)
@@ -137,7 +140,7 @@ func initializeDatabase(db *sql.DB) error {
 
 	if count == 0 {
 		log.Println("No hay usuarios, procediendo a insertar...")
-
+		// código inserción de usuarios
 		tx, err := db.Begin()
 		if err != nil {
 			return fmt.Errorf("error iniciando transacción: %v", err)
@@ -175,37 +178,74 @@ func initializeDatabase(db *sql.DB) error {
 		if err = tx.Commit(); err != nil {
 			return fmt.Errorf("error en commit: %v", err)
 		}
-
-		log.Println("Transacción completada exitosamente")
 	}
 
-	// Verificación final
-	var users []struct {
-		Email string
-		Role  string
-	}
-	rows, err := db.Query("SELECT email, role FROM users")
+	// Verificación y registro de canciones existentes
+	log.Println("Verificando archivos de música existentes...")
+	files, err := os.ReadDir("./uploads/songs")
 	if err != nil {
-		return fmt.Errorf("error verificando usuarios finales: %v", err)
+		return fmt.Errorf("error leyendo directorio songs: %v", err)
 	}
-	defer rows.Close()
 
-	for rows.Next() {
-		var u struct {
-			Email string
-			Role  string
+	for _, file := range files {
+		if !strings.HasSuffix(strings.ToLower(file.Name()), ".mp3") {
+			continue
 		}
-		if err := rows.Scan(&u.Email, &u.Role); err != nil {
-			return fmt.Errorf("error leyendo usuario: %v", err)
+
+		// Verificar si la canción ya existe en la base de datos
+		var exists bool
+		err := db.QueryRow("SELECT EXISTS(SELECT 1 FROM songs WHERE file_path = ?)", file.Name()).Scan(&exists)
+		if err != nil {
+			log.Printf("Error verificando canción %s: %v", file.Name(), err)
+			continue
 		}
-		users = append(users, u)
+
+		if !exists {
+			// Obtener información del archivo
+			fileInfo, err := file.Info()
+			if err != nil {
+				log.Printf("Error obteniendo información del archivo %s: %v", file.Name(), err)
+				continue
+			}
+
+			// Extraer título de la canción del nombre del archivo
+			parts := strings.Split(file.Name(), "_")
+			var title, artist string
+			if len(parts) > 1 {
+				title = strings.TrimSuffix(parts[1], ".mp3")
+				artist = "Unknown Artist" //
+			} else {
+				title = strings.TrimSuffix(file.Name(), ".mp3")
+				artist = "Unknown Artist"
+			}
+
+			// Insertar la canción en la base de datos
+			_, err = db.Exec(
+				"INSERT INTO songs (title, artist, genre, file_size, file_path) VALUES (?, ?, ?, ?, ?)",
+				title,
+				artist,
+				"Rock", // Género
+				fileInfo.Size(),
+				file.Name(),
+			)
+			if err != nil {
+				log.Printf("Error insertando canción %s: %v", file.Name(), err)
+			} else {
+				log.Printf("Canción registrada exitosamente: %s", title)
+			}
+		}
 	}
 
-	log.Printf("Usuarios en la base de datos después de la inicialización:")
-	for _, u := range users {
-		log.Printf("- Email: %s, Role: %s", u.Email, u.Role)
+	// Mostrar resumen final
+	var songCount int
+	err = db.QueryRow("SELECT COUNT(*) FROM songs").Scan(&songCount)
+	if err != nil {
+		log.Printf("Error contando canciones: %v", err)
+	} else {
+		log.Printf("Total de canciones en la base de datos: %d", songCount)
 	}
 
+	log.Println("Inicialización de la base de datos completada")
 	return nil
 }
 
