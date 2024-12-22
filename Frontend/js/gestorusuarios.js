@@ -5,13 +5,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const emailInput = document.getElementById("email");
     const roleInput = document.getElementById("role");
     const userIdInput = document.getElementById("userId");
+    const alertContainer = document.createElement("div"); // Contenedor para mensajes de alerta
+    userForm.parentElement.insertBefore(alertContainer, userForm); // Insertar antes del formulario
 
-    let users = [];
+    // Datos iniciales
+    let users = [
+        { username: 'Juan Perez', email: 'juan.perez@example.com', role: 'user' },
+        { username: 'Ana Gomez', email: 'ana.gomez@example.com', role: 'user' },
+        { username: 'Carlos Lopez', email: 'carlos.lopez@example.com', role: 'user' },
+    ];
+
     let editMode = false;
 
     // Función para renderizar la tabla de usuarios
     const renderTable = () => {
-        userTableBody.innerHTML = "";
+        userTableBody.innerHTML = ""; // Limpiar el cuerpo de la tabla
         users.forEach((user, index) => {
             const row = document.createElement("tr");
             row.innerHTML = `
@@ -36,9 +44,19 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
+    // Mostrar mensaje de alerta
+    const showAlert = (message, type = "success") => {
+        alertContainer.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+    };
+
     // Función para manejar el envío del formulario
     userForm.addEventListener("submit", (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Evitar recargar la página
 
         const username = usernameInput.value.trim();
         const email = emailInput.value.trim();
@@ -61,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Renderizar la tabla y mostrar éxito
         renderTable();
-        alert("Usuario guardado con éxito");
+        showAlert("Usuario guardado con éxito");
     });
 
     // Función para editar usuario
@@ -75,41 +93,21 @@ document.addEventListener("DOMContentLoaded", () => {
         roleInput.value = user.role;
         userIdInput.value = index;
 
-        editMode = true;
+        editMode = true; // Activar modo edición
     };
 
     // Función para eliminar usuario
     const handleDeleteUser = (e) => {
         const index = e.target.dataset.index;
 
+        // Confirmar antes de eliminar
         if (confirm("¿Estás seguro de eliminar este usuario?")) {
             users.splice(index, 1); // Eliminar usuario del array
             renderTable(); // Actualizar tabla
+            showAlert("Usuario eliminado con éxito", "danger"); // Mostrar alerta
         }
     };
 
     // Renderizar la tabla inicialmente
     renderTable();
-
-    // Funcionalidad de Logout
-    document.querySelector('.logout').addEventListener('click', () => {
-        if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-            fetch('/api/logout', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-            })
-            .then(response => {
-                if (response.ok) {
-                    localStorage.removeItem('userToken');
-                    window.location.href = '/';
-                } else {
-                    throw new Error('Error en logout');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error al cerrar sesión');
-            });
-        }
-    });
 });

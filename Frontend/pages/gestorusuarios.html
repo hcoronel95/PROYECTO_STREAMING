@@ -11,7 +11,7 @@
     <header>
         <div class="admin-info d-flex justify-content-between align-items-center p-3 bg-dark text-white">
             <p class="mb-0">Bienvenido, Administrador</p>
-            <button class="back-btn" onclick="window.location.href='admin.html'">Volver</button>
+            <button class="btn btn-light" onclick="window.location.href='admin.html'">Volver</button>
         </div>
     </header>
 
@@ -33,12 +33,10 @@
             <div class="form-group mb-3">
                 <label for="role">Rol</label>
                 <select id="role" name="role" class="form-control" required>
-                    <option value="Administrador">Administrador</option>
-                    <option value="Usuario">Usuario</option>
+                    <option value="user">Usuario</option>
                 </select>
             </div>
 
-            <input type="hidden" id="userId" name="userId">
             <button type="submit" class="btn btn-primary">Guardar Usuario</button>
         </form>
 
@@ -59,7 +57,80 @@
         </table>
     </main>
 
-    <script src="gestorusuarios.js"></script>
+    <script>
+        const userTableBody = document.getElementById('userTableBody');
+        const localStorageKey = "usuarios";
+
+        // Obtener usuarios de LocalStorage o usar los predefinidos
+        const usuarios = JSON.parse(localStorage.getItem(localStorageKey)) || [
+            { username: 'Juan Perez', email: 'juan.perez@example.com', role: 'user' },
+            { username: 'Ana Gomez', email: 'ana.gomez@example.com', role: 'user' },
+            { username: 'Carlos Lopez', email: 'carlos.lopez@example.com', role: 'user' },
+            { username: 'Henry Aliaga', email: 'henry@example.com', role: 'admin' },
+            { username: 'Ismael Espinoza', email: 'ismael@example.com', role: 'admin' }
+        ];
+
+        // Renderizar usuarios en la tabla
+        function cargarUsuarios() {
+            userTableBody.innerHTML = ''; // Limpiar tabla
+            usuarios.forEach((usuario, index) => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${usuario.username}</td>
+                    <td>${usuario.email}</td>
+                    <td>${usuario.role}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="eliminarUsuario(${index})">Eliminar</button>
+                    </td>
+                `;
+                userTableBody.appendChild(fila);
+            });
+        }
+
+        // Guardar usuarios en LocalStorage
+        function guardarUsuarios() {
+            localStorage.setItem(localStorageKey, JSON.stringify(usuarios));
+        }
+
+        // Agregar usuario desde el formulario
+        document.getElementById('userForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const role = document.getElementById('role').value;
+
+            if (!username || !email || !role) {
+                alert("Por favor, completa todos los campos.");
+                return;
+            }
+
+            // Agregar nuevo usuario al arreglo
+            usuarios.push({ username, email, role });
+
+            // Guardar cambios en LocalStorage y actualizar tabla
+            guardarUsuarios();
+            cargarUsuarios();
+
+            // Limpiar formulario
+            e.target.reset();
+            alert("Usuario agregado con éxito.");
+        });
+
+        // Eliminar usuario
+        function eliminarUsuario(index) {
+            if (confirm("¿Estás seguro de eliminar este usuario?")) {
+                usuarios.splice(index, 1); // Eliminar del arreglo
+                guardarUsuarios(); // Guardar cambios en LocalStorage
+                cargarUsuarios(); // Actualizar tabla
+            }
+        }
+
+        // Renderizar tabla al cargar la página
+        cargarUsuarios();
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
