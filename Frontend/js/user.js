@@ -1,40 +1,74 @@
-let player = null; // Variable global para el reproductor
-
 class MusicPlayer {
     constructor() {
         this.currentSong = null;
         this.audio = new Audio();
         this.songs = [];
         this.isPlaying = false;
-        this.initializePlayer();
+        this.currentSongIndex = -1;
+        this.initializeElements();
+        this.loadUserInfo();
         this.loadSongs();
+        this.setupEventListeners();
     }
 
-    initializePlayer() {
-        const playBtn = document.querySelector('.player-btn.play');
-        const prevBtn = document.querySelector('.player-btn.prev');
-        const nextBtn = document.querySelector('.player-btn.next');
-        const searchInput = document.querySelector('.search-input');
-        const progressBar = document.querySelector('.progress-bar');
+    initializeElements() {
+        this.songGrid = document.getElementById('songGrid');
+        this.searchInput = document.querySelector('.search-input');
+        this.genreFilter = document.querySelector('.genre-filter');
+        this.playBtn = document.getElementById('playBtn');
+        this.prevBtn = document.getElementById('prevBtn');
+        this.nextBtn = document.getElementById('nextBtn');
+        this.currentTitle = document.getElementById('currentTitle');
+        this.currentArtist = document.getElementById('currentArtist');
+        this.currentCover = document.getElementById('currentCover');
+        this.progress = document.querySelector('.progress');
+    }
 
-        if (playBtn) {
-            playBtn.addEventListener('click', () => this.togglePlay());
+    setupEventListeners() {
+        if (this.searchInput) {
+            this.searchInput.addEventListener('input', (e) => this.filterSongs(e.target.value));
         }
-        if (prevBtn) {
-            prevBtn.addEventListener('click', () => this.playPrevious());
+        if (this.genreFilter) {
+            this.genreFilter.addEventListener('change', (e) => this.filterByGenre(e.target.value));
         }
-        if (nextBtn) {
-            nextBtn.addEventListener('click', () => this.playNext());
+        if (this.playBtn) {
+            this.playBtn.addEventListener('click', () => this.togglePlay());
         }
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => this.searchSongs(e.target.value));
+        if (this.prevBtn) {
+            this.prevBtn.addEventListener('click', () => this.playPrevious());
         }
-        if (progressBar) {
-            progressBar.addEventListener('click', (e) => this.setProgress(e));
+        if (this.nextBtn) {
+            this.nextBtn.addEventListener('click', () => this.playNext());
         }
 
+        // Eventos del reproductor de audio
         this.audio.addEventListener('timeupdate', () => this.updateProgress());
         this.audio.addEventListener('ended', () => this.playNext());
+
+        // Evento de logout
+        const logoutButton = document.querySelector('.logout-button');
+        if (logoutButton) {
+            logoutButton.addEventListener('click', () => this.handleLogout());
+        }
+    }
+
+    async loadUserInfo() {
+        try {
+            const response = await fetch('/api/user-info', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('userToken')}`
+                }
+            });
+            if (response.ok) {
+                const userData = await response.json();
+                const welcomeMessage = document.getElementById('welcome-message');
+                if (welcomeMessage && userData.name) {
+                    welcomeMessage.textContent = `Bienvenido`;
+                }
+            }
+        } catch (error) {
+            console.error('Error cargando información del usuario:', error);
+        }
     }
 
     async loadSongs() {
@@ -44,12 +78,9 @@ class MusicPlayer {
                     'Authorization': `Bearer ${localStorage.getItem('userToken')}`
                 }
             });
-
             if (response.ok) {
                 this.songs = await response.json();
                 this.displaySongs(this.songs);
-            } else {
-                console.error('Error al cargar canciones:', await response.text());
             }
         } catch (error) {
             console.error('Error cargando canciones:', error);
@@ -57,24 +88,41 @@ class MusicPlayer {
     }
 
     displaySongs(songs) {
-        const musicList = document.querySelector('.music-list');
-        if (!musicList) return;
+        if (!this.songGrid) return;
 
-        musicList.innerHTML = songs.map((song, index) => `
-            <div class="song-item" data-index="${index}">
-                <img src="../images/music-cover.jpg" alt="${song.title}" class="custom-img-size">
+        this.songGrid.innerHTML = songs.map((song, index) => `
+            <div class="song-card" data-index="${index}">
+                <img src="../images/${song.genre.toLowerCase()}.jpg" 
+                     alt="${song.title}" 
+                     class="song-image"
+                     onerror="this.src='../images/fondonota.jpg'">
                 <div class="song-info">
                     <h3>${song.title}</h3>
                     <p>${song.artist}</p>
-                    <p>${song.genre}</p>
+                    <p class="genre-tag">${song.genre}</p>
                 </div>
             </div>
         `).join('');
 
-        musicList.querySelectorAll('.song-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const index = parseInt(item.dataset.index);
+        // Agregar event listeners a las tarjetas
+        this.songGrid.querySelectorAll('.song-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const index = parseInt(card.dataset.index);
                 this.playSong(index);
+            });
+
+            // Preview al pasar el mouse
+            card.addEventListener('mouseenter', () => {
+                if (!this.isPlaying) {
+                    const index = parseInt(card.dataset.index);
+                    this.previewSong(index);
+                }
+            });
+
+            card.addEventListener('mouseleave', () => {
+                if (!this.isPlaying) {
+                    this.stopPreview();
+                }
             });
         });
     }
@@ -83,24 +131,43 @@ class MusicPlayer {
         if (index < 0 || index >= this.songs.length) return;
 
         const song = this.songs[index];
-        this.currentSong = index;
+        this.currentSongIndex = index;
+        this.currentSong = song;
 
-        const titleElement = document.querySelector('.song-title');
-        const artistElement = document.querySelector('.song-artist');
+        // Actualizar interfaz
+        this.currentTitle.textContent = song.title;
+        this.currentArtist.textContent = song.artist;
+        this.currentCover.src = `../images/${song.genre.toLowerCase()}.jpg`;
 
-        if (titleElement) titleElement.textContent = song.title;
-        if (artistElement) artistElement.textContent = song.artist;
-
+        // Reproducir audio
         this.audio.src = song.file_path;
         this.audio.play()
-            .catch(error => console.error('Error reproduciendo canción:', error));
-        this.isPlaying = true;
-        this.updatePlayButton();
+            .then(() => {
+                this.isPlaying = true;
+                this.updatePlayButton();
+            })
+            .catch(error => console.error('Error reproduciendo:', error));
+    }
+
+    previewSong(index) {
+        const song = this.songs[index];
+        this.audio.src = song.file_path;
+        this.audio.volume = 0.3; // Volumen más bajo para preview
+        this.audio.currentTime = 0;
+        this.audio.play().catch(error => console.error('Error en preview:', error));
+    }
+
+    stopPreview() {
+        this.audio.pause();
+        this.audio.currentTime = 0;
+        this.audio.volume = 1.0; // Restaurar volumen normal
     }
 
     togglePlay() {
-        if (this.audio.paused) {
-            this.audio.play().catch(error => console.error('Error reproduciendo:', error));
+        if (this.currentSongIndex === -1 && this.songs.length > 0) {
+            this.playSong(0);
+        } else if (this.audio.paused) {
+            this.audio.play();
             this.isPlaying = true;
         } else {
             this.audio.pause();
@@ -110,46 +177,33 @@ class MusicPlayer {
     }
 
     updatePlayButton() {
-        const playBtn = document.querySelector('.player-btn.play');
-        if (playBtn) {
-            playBtn.textContent = this.isPlaying ? '⏸' : '▶';
+        if (this.playBtn) {
+            this.playBtn.textContent = this.isPlaying ? '⏸' : '▶';
         }
     }
 
     playNext() {
-        if (this.currentSong !== null) {
-            const nextIndex = (this.currentSong + 1) % this.songs.length;
+        if (this.currentSongIndex > -1) {
+            const nextIndex = (this.currentSongIndex + 1) % this.songs.length;
             this.playSong(nextIndex);
         }
     }
 
     playPrevious() {
-        if (this.currentSong !== null) {
-            const prevIndex = (this.currentSong - 1 + this.songs.length) % this.songs.length;
+        if (this.currentSongIndex > -1) {
+            const prevIndex = (this.currentSongIndex - 1 + this.songs.length) % this.songs.length;
             this.playSong(prevIndex);
         }
     }
 
     updateProgress() {
-        const progress = document.querySelector('.progress');
-        const progressBar = document.querySelector('.progress-bar');
-        if (progress && progressBar && this.audio.duration) {
+        if (this.progress && this.audio.duration) {
             const percentage = (this.audio.currentTime / this.audio.duration) * 100;
-            progress.style.width = `${percentage}%`;
+            this.progress.style.width = `${percentage}%`;
         }
     }
 
-    setProgress(e) {
-        const progressBar = document.querySelector('.progress-bar');
-        if (progressBar && this.audio.duration) {
-            const width = progressBar.clientWidth;
-            const clickX = e.offsetX;
-            const duration = this.audio.duration;
-            this.audio.currentTime = (clickX / width) * duration;
-        }
-    }
-
-    searchSongs(query) {
+    filterSongs(query) {
         const filteredSongs = this.songs.filter(song =>
             song.title.toLowerCase().includes(query.toLowerCase()) ||
             song.artist.toLowerCase().includes(query.toLowerCase()) ||
@@ -157,44 +211,41 @@ class MusicPlayer {
         );
         this.displaySongs(filteredSongs);
     }
+
+    filterByGenre(genre) {
+        if (!genre) {
+            this.displaySongs(this.songs);
+        } else {
+            const filteredSongs = this.songs.filter(song => 
+                song.genre.toLowerCase() === genre.toLowerCase()
+            );
+            this.displaySongs(filteredSongs);
+        }
+    }
+
+    async handleLogout() {
+        if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+            try {
+                const response = await fetch('/api/logout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (response.ok) {
+                    localStorage.removeItem('userToken');
+                    window.location.href = '/';
+                } else {
+                    throw new Error('Error en logout');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cerrar sesión');
+            }
+        }
+    }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    player = new MusicPlayer();
-
-    const token = localStorage.getItem('userToken');
-    if (token) {
-        fetch('/api/user-info', {
-            method: 'GET',
-            headers: { 'Authorization': `Bearer ${token}` }
-        })
-            .then(response => response.json())
-            .then(data => {
-                const welcomeMessage = document.querySelector('#welcome-message');
-                if (data && data.name) {
-                    welcomeMessage.textContent = `Bienvenido, ${data.name}`;
-                } else {
-                    welcomeMessage.textContent = 'Bienvenido, usuario desconocido';
-                }
-            })
-            .catch(error => console.error('Error obteniendo información del usuario:', error));
-    }
-
-    const logoutButton = document.querySelector(".logout-button");
-    if (logoutButton) {
-        logoutButton.addEventListener("click", () => {
-            if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
-                fetch("/api/logout", { method: "POST", headers: { "Content-Type": "application/json" } })
-                    .then(response => {
-                        if (response.ok) {
-                            alert("Sesión cerrada exitosamente.");
-                            window.location.href = "/";
-                        } else {
-                            alert("Error cerrando sesión.");
-                        }
-                    })
-                    .catch(err => console.error("Error:", err));
-            }
-        });
-    }
+// Inicializar el reproductor cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', () => {
+    new MusicPlayer();
 });
