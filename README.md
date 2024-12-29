@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 @Autores: Henry Aliaga / Ismael Espinoza
 
@@ -21,3 +22,7 @@ Se considero que dentro de las limitaciones del entorno local y garantizando que
 3. Verificar que las canciones estén en Backend/uploads/songs/
 4. Eliminar cache e historial de navegador(para evitar conflictos de versiones anteriores en caso de una descarga de un compilado anterior o versionamiento)
 5. Iniciar el servidor Go del backend el archivo main.go , con el comando go run main.go en Visual Code
+=======
+# PROYECTO_STREAMING
+Proyecto de Streaming de musica
+>>>>>>> 0d9dbaea521cae54fe99d0163fca256ff9d4bafe

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interfaz de Usuario</title>
+    <link rel="stylesheet" href="../css/userinterface.css">
+</head>
+<body>
+    <!-- Barra de búsqueda en la esquina superior derecha -->
+    <div class="search-container">
+        <input type="text" class="search-input" placeholder="Buscar canciones...">
+        <select class="genre-filter">
+            <option value="">Todos los géneros</option>
+            <option value="Rock">Rock</option>
+            <option value="Pop">Pop</option>
+            <option value="Metal">Metal</option>
+            <option value="Jazz">Jazz</option>
+        </select>
+    </div>
+
+    <!-- Encabezado con información del usuario -->
+    <header>
+        <div class="user-info">
+            <img src="../images/user-avatar.jpg" alt="Avatar del Usuario" class="avatar">
+            <h2 id="welcome-message">Bienvenido</h2>
+        </div>
+    </header>
+
+    <!-- Contenedor principal -->
+    <main class="main-container">
+        <!-- Sección de biblioteca -->
+        <section class="recommendations">
+            <h2>Reproducción de Música:</h2>
+            <div class="recommendation-list">
+                <div class="music-grid">
+                    <!-- Imagen de Metallica -->
+                    <div class="music-card">
+                        <img src="../images/metallica.jpg" alt="Metallica" onclick="window.location.href='player.html'">
+                        <p>Ver listado completo</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de reproducción -->
+        <section class="your-music">
+            <h2>Biblioteca</h2>
+            <div class="music-list" id="songGrid">
+                <!-- Las canciones se cargarán aquí dinámicamente -->
+            </div>
+        </section>
+
+
+
+        <!-- Botón de salir -->
+        <button class="logout-button">Salir</button>
+    </main>
+
+    <script src="../js/user.js"></script>
+</body>
+</html>
