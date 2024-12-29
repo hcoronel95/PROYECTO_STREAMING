@@ -1,0 +1,105 @@
+/* Fondo y estilo general */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-image: url("../images/headphones.jpg"); /* Asegúrate de que la ruta sea correcta */
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    height: 100vh; /* Asegura que el fondo ocupe toda la altura */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+/* Estilos del contenedor de login */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* El contenedor debe usar el 100% del alto del body */
+    width: 100%; /* Asegura que ocupe todo el ancho */
+    background: transparent; /* Asegura que no tenga un color sólido que oculte la imagen */
+}
+
+/* Estilo de la tarjeta de login */
+.login-card {
+    max-width: 400px;
+    width: 90%; /* Diseño responsivo */
+    background: rgba(0, 0, 0, 0.6); /* Fondo translúcido */
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    color: white;
+}
+
+.login-card h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.login-card .form-label {
+    color: rgba(255, 255, 255, 0.8); /* Blanco translúcido */
+}
+
+.login-card .form-control {
+    background: rgba(255, 255, 255, 0.8); /* Fondo más claro para los campos de texto */
+    color: #333;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.login-card .form-control:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.8);
+}
+
+.login-card .btn {
+    background: #007bff;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    margin-top: 10px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease;
+}
+
+.login-card .btn:hover {
+    background: #0056b3;
+}
+
+.error-message {
+    color: #dc3545;
+    display: none;
+}
+
+.login-card a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.login-card a span {
+    color: #007bff;
+}
+
+/* Estilo personalizado para el botón regresar */
+.login-card .btn-secondary {
+    background-color: #6c757d; /* Color de fondo gris */
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+    padding: 10px 20px;
+    text-transform: uppercase;
+}
+
+.login-card .btn-secondary:hover {
+    background-color: #5a6268; /* Color de fondo al pasar el mouse */
+    color: white;
+}

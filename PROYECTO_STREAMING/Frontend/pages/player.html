@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reproductor - Streaming Music</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/player.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="bg-dark text-white py-2 px-4 d-flex justify-content-between align-items-center shadow">
+        <h4 class="mb-0">Streaming Music</h4>
+        <nav class="d-flex align-items-center">
+            <button onclick="window.location.href='user.html';" class="custom-btn">Inicio</button>
+        </nav>
+        <button class="logout-btn">Cerrar sesión</button>
+    </header>
+
+    
+
+    <!-- Lista de canciones -->
+    <div class="container mt-4">
+        <div class="card bg-dark text-white shadow">
+            <div class="card-header">
+                <h5 class="mb-0">Biblioteca</h5>
+            </div>
+            <div class="card-body song-list-container">
+                <!-- Las canciones se cargarán dinámicamente aquí -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Reproductor -->
+    <div class="player-bar fixed-bottom">
+        <div class="container d-flex justify-content-center align-items-center">
+            <div class="d-flex align-items-center">
+                <img src="../images/fondonota.jpg" id="albumCover" class="rounded me-3" alt="Portada" style="width: 50px; height: 50px;">
+                <div>
+                    <h6 id="currentSong" class="mb-0">No hay canción seleccionada</h6>
+                    <small id="currentArtist" class="text-muted">Artista</small>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center w-100">
+                <button class="btn btn-outline-light mx-2" id="prevBtn">⏮</button>
+                <button class="btn btn-primary mx-2" id="playBtn">▶</button>
+                <button class="btn btn-outline-light mx-2" id="nextBtn">⏭</button>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/player.js"></script>
+</body>
+</html>

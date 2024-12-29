@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Streaming Music</title>
+    <!-- Referencias a Bootstrap y los estilos -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Contenedor del login -->
+    <div class="login-container">
+        <div class="container">
+            <div class="login-card card">
+                <div class="card-body">
+                    <h2 class="text-center mb-4">Streaming Music</h2>
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="password" required>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Ingresar</button>
+                        </div>
+                        <div id="errorMessage" class="error-message text-center mt-3"></div>
+                        <div class="text-center mt-3">
+                            <a href="register.html" class="text-decoration-none">
+                                ¿No tienes cuenta? <span class="text-primary">Regístrate aquí</span>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Referencias a Bootstrap y el archivo JS principal -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+</html>
